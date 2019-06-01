@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Wireshark: IP Location Map</title>
+    <style type="text/css">
+    body {
+      font-family: Arial, Helvetica, sans-serif; font-size: 13px;
+      line-height: 17px;
+    }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" src="http://openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+
+    <script type="text/javascript">
+        <!--
+        var map, layer;
+        var selectControl, selectedFeature;
+
+        function onPopupClose(event) {
+            selectControl.unselect(this.feature);
+        }
+
+        function EndpointSelected(event) {
+            var feature = event.feature;
+            popup = new OpenLayers.Popup.FramedCloud("endpoint",
+                feature.geometry.getBounds().getCenterLonLat(),
+                new OpenLayers.Size(25,25),
+                "<h3>"+ feature.attributes.title + "</h3>" +
+                feature.attributes.description,
+                null, true, onPopupClose);
+            feature.popup = popup;
+            popup.feature = feature;
+            map.addPopup(popup);
+        }
+
+        function EndpointUnselected(event) {
+            var feature = event.feature;
+            if (feature.popup) {
+                popup.feature = null;
+                map.removePopup(feature.popup);
+                feature.popup.destroy();
+                feature.popup = null;
+            }
+        }
+
+        var si_format = d3.format('.2s');
+
+        function makeGeoPoint(o)
+        {
+            var obj = { };
+            var prop = { };
+
+            /* Longitude + latitude */
+            obj['type'] = 'Features';
+            obj['geometry'] = { type: 'Point', 'coordinates': [ o['geoip_lon'], o['geoip_lat'] ]};
+
+            /* Address */
+            prop['title'] = o['_name'];
+            prop['description'] = '';
+
+            /* Description */
+            prop['description'] += '<div class="geoip_property">Packets: ' + si_format(o['_packets']) + "</div>";
+            prop['description'] += '<div class="geoip_property">Bytes: ' + si_format(o['_bytes']) + "</div>";
+
+            if (o['geoip_city'] != undefined)
+                prop['description'] += '<div class="geoip_property">City: ' + o['geoip_city'] + "</div>";
+
+            if (o['geoip_country'] != undefined)
+                prop['description'] += '<div class="geoip_property">Country: ' + o['geoip_country'] + "</div>";
+
+            if (o['geoip_org'] != undefined)
+                prop['description'] += '<div class="geoip_property">Organization: ' + o['geoip_org'] + "</div>";
+
+            if (o['geoip_isp'] != undefined)
+                prop['description'] += '<div class="geoip_property">ISP: ' + o['geoip_isp'] + "</div>";
+
+            if (o['geoip_as'] != undefined)
+                prop['description'] += '<div class="geoip_property">AS Number: ' + o['geoip_as'] + "</div>";
+
+            obj['properties'] = prop;
+
+            return obj;
+        }
+
+        function init() {
+            var data = JSON.parse(window.atob(window.location.hash.slice(1)));
+            var endpoint_features = [];
+
+        if (data['h'] != undefined)
+        {
+            data = data['h'];
+            /* create endpoints.features, like ui/traffic_table_ui.c would do */
+            for (var i = 0; i < data.length; i++)
+            {
+                var o = data[i];
+                if (o['geoip_lon'] == undefined || o['geoip_lat'] == undefined)
+                    continue;
+
+                endpoint_features.push(makeGeoPoint(o));
+            }
+        }
+        else if (data['c'] != undefined)
+        {
+            data = data['c'];
+
+            hosts = { };
+
+            /* generate hosts set */
+            for (var i = 0; i < data.length; i++)
+            {
+                var o = data[i];
+
+                var shost = hosts[o['_sname']];
+                var dhost = hosts[o['_dname']];
+
+                if (shost == undefined)
+                    shost = hosts[o['_sname']] = {
+                        geoip_lon: o['geoip_lon1'], geoip_lat: o['geoip_lat1'],
+                        geoip_city: o['geoip_city1'], geoip_country: o['geoip_country1'], geoip_org: o['geoip_org1'], geoip_isp: o['geoip_isp1'], geoip_as: o['geoip_as1'],
+                        _name: o['_sname'], _packets: 0, _bytes: 0
+                    };
+
+                if (dhost == undefined)
+                    dhost = hosts[o['_dname']] = {
+                        geoip_lon: o['geoip_lon2'], geoip_lat: o['geoip_lat2'],
+                        geoip_city: o['geoip_city2'], geoip_country: o['geoip_country2'], geoip_org: o['geoip_org2'], geoip_isp: o['geoip_isp2'], geoip_as: o['geoip_as2'],
+                        _name: o['_dname'], _packets: 0, _bytes: 0
+                    };
+
+                shost['_packets'] += o['_packets'];
+                shost['_bytes']   += o['_bytes'];
+
+                dhost['_packets'] += o['_packets'];
+                dhost['_bytes']   += o['_bytes'];
+            }
+
+            /* TODO, there is a problem - that if multiple hosts, resolves to same position it creates single dot, and after clicking that dot.
+             * EndpointSelected() shows only single one.
+             * Potential fix: http://gis.stackexchange.com/questions/84520/how-to-display-a-popup-for-two-points-which-have-same-longitude-and-latitude
+             * Can be tested with bugs/011030_packet-dcp-etsi.pcap - there are multiple endpoints with same lat, lon
+             */
+            for (var hh in hosts)
+            {
+                var host = hosts[hh];
+
+                if (host['geoip_lon'] == undefined || host['geoip_lat'] == undefined)
+                    continue;
+
+                endpoint_features.push(makeGeoPoint(host));
+            }
+
+            for (var i = 0; i < data.length; i++)
+            {
+                var o = data[i];
+
+                if (o['geoip_lon1'] == undefined || o['geoip_lat1'] == undefined)
+                    continue;
+                if (o['geoip_lon2'] == undefined || o['geoip_lat2'] == undefined)
+                    continue;
+
+                var obj = { };
+                var prop = { };
+
+                /* Longitude + latitude */
+                obj['type'] = 'Features';
+                obj['geometry'] = { type: 'LineString', 'coordinates': [ [ o['geoip_lon1'], o['geoip_lat1'] ], [ o['geoip_lon2'], o['geoip_lat2']] ]};
+
+                /* Address */
+                prop['title'] = o['_name'];
+                prop['description'] = '';
+
+                /* Description */
+                prop['description'] += '<div class="geoip_property">Packets: ' + si_format(o['_packets']) + "</div>";
+                prop['description'] += '<div class="geoip_property">Bytes: ' + si_format(o['_bytes']) + "</div>";
+
+                obj['properties'] = prop;
+
+                endpoint_features.push(obj);
+            }
+        }
+
+            var endpoints = {
+                "type": "FeatureCollection",
+                "features": endpoint_features
+            };
+
+            map = new OpenLayers.Map('map', {
+                controls: [
+                    new OpenLayers.Control.PanZoomBar(),
+                    new OpenLayers.Control.ZoomBox(),
+                    new OpenLayers.Control.ScaleLine(),
+                    new OpenLayers.Control.MousePosition(),
+                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.Attribution()
+                    ]
+                //projection: new OpenLayers.Projection("EPSG:900913"),
+                //displayProjection: new OpenLayers.Projection("EPSG:4326"),
+                //maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34, 20037508.34, 20037508.34),
+                //numZoomLevels: 18,
+                //maxResolution: 156543,
+                //units: "m"
+            });
+            layer = new OpenLayers.Layer.WMS("OpenLayers WMS",
+                    "http://vmap0.tiles.osgeo.org/wms/vmap0",
+                    {layers: 'basic'},
+                    {wrapDateLine: true} );
+            map.addLayer(layer);
+            //map.addLayer(new OpenLayers.Layer.OSM.Mapnik("Mapnik"));
+            //map.addLayer(new OpenLayers.Layer.Text("IP Locations", {
+            //    location: map_file, projection: new OpenLayers.Projection("EPSG:4326")} ) );
+            //
+            //map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+
+            var geojson_format = new OpenLayers.Format.GeoJSON();
+            var vector_layer = new OpenLayers.Layer.Vector("IP Endpoints");
+            map.addLayer(vector_layer);
+            vector_layer.addFeatures(geojson_format.read(endpoints));
+
+            if (endpoints.features.length < 1) {
+                document.getElementById("statusmsg").innerHTML = "No endpoints to map";
+            } else {
+                map.zoomToExtent(vector_layer.getDataExtent());
+            }
+
+            selectControl = new OpenLayers.Control.SelectFeature(vector_layer);
+            map.addControl(selectControl);
+            selectControl.activate();
+
+            vector_layer.events.on({
+                'featureselected': EndpointSelected,
+                'featureunselected': EndpointUnselected
+            });
+        }
+        // -->
+    </script>
+  </head>
+  <body onload="init()">
+    <p>Webshark includes GeoLite2 data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a></p>
+    <div style="height: 95%;">
+        <div id="statusmsg" style="float: right; z-index: 9999;"></div>
+        <div id="map" style="z-index: 0;"></div>
+    </div>
+  </body>
+</html>

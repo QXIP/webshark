@@ -1,0 +1,34 @@
+diff --git a/epan/proto.c b/epan/proto.c
+index 2d698114db..57c03af6c0 100644
+--- a/epan/proto.c
++++ b/epan/proto.c
+@@ -7560,7 +7560,7 @@ static void
+ tmp_fld_check_assert(header_field_info *hfinfo)
+ {
+ 	gchar* tmp_str;
+-
++return;
+ 	/* The field must have a name (with length > 0) */
+ 	if (!hfinfo->name || !hfinfo->name[0]) {
+ 		if (hfinfo->abbrev)
+@@ -8142,7 +8142,7 @@ proto_register_field_init(header_field_info *hfinfo, const int parent)
+ 
+ 		/* Check that the filter name (abbreviation) is legal;
+ 		 * it must contain only alphanumerics, '-', "_", and ".". */
+-		c = proto_check_field_name(hfinfo->abbrev);
++		c = 0;
+ 		if (c) {
+ 			if (c == '.') {
+ 				fprintf(stderr, "Invalid leading, duplicated or trailing '.' found in filter name '%s'\n", hfinfo->abbrev);
+diff --git a/epan/uat_load.l b/epan/uat_load.l
+index 1aceb6a703..826207d18c 100644
+--- a/epan/uat_load.l
++++ b/epan/uat_load.l
+@@ -379,6 +379,7 @@ uat_load(uat_t *uat, const gchar *filename, char **errx)
+ 		return TRUE;
+ 	}
+ 
++	return FALSE; /* no such file */
+ 
+ 	if (!(in = ws_fopen(fname,"r"))) {
+ 		*errx = g_strdup(g_strerror(errno));

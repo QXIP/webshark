@@ -1,0 +1,31 @@
+diff --git a/sharkd_daemon.c b/sharkd_daemon.c
+index f2397821bf..cdebc9e2e8 100644
+--- a/sharkd_daemon.c
++++ b/sharkd_daemon.c
+@@ -46,7 +46,8 @@
+ /* for windows support TCP sockets */
+ # define SHARKD_TCP_SUPPORT
+ #else
+-/* for other system support only local sockets */
++/* for other system support TCP and local sockets */
++# define SHARKD_TCP_SUPPORT
+ # define SHARKD_UNIX_SUPPORT
+ #endif
+ 
+diff --git a/ui/voip_calls.c b/ui/voip_calls.c
+index 6942c8154e..3dcf5c2cf0 100644
+--- a/ui/voip_calls.c
++++ b/ui/voip_calls.c
+@@ -54,8 +54,10 @@
+ #include "ui/ws_ui_util.h"
+ #include "ui/voip_calls.h"
+ 
+-#define DUMP_PTR1(p) printf("#=> %p\n",(void *)p)
+-#define DUMP_PTR2(p) printf("==> %p\n",(void *)p)
++#define DUMP_PTR1(p) fprintf(stderr, "#=> %p\n",(void *)p)
++#define DUMP_PTR2(p) fprintf(stderr, "==> %p\n",(void *)p)
++
++#define simple_dialog(...)
+ 
+ const char *voip_call_state_name[8]={
+     "",

@@ -1,0 +1,213 @@
+body { background-color: #F8F8F8; margin: 0; }
+
+#ws_div
+{
+	margin-left: 8px;
+}
+
+#user_toolbar
+{
+	margin-left: -8px;
+	padding-bottom: 4px;
+	background-color: #d8F8F8;
+}
+
+.wsbutton
+{
+	border: none;
+	padding: 4px 12px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+
+	float: left;
+	font-size: 12px;
+	background-color: #ccc;
+}
+
+button.selected, tr.selected
+{
+	background-color: #0080FF !important;
+}
+
+span.hexdump_offset
+{
+	background-color: #dddddd;
+}
+
+span.selected_bytes
+{
+	background-color: #0080FF;
+}
+
+span.selected_proto
+{
+	background-color: #bbbbbb;
+}
+
+li.selected
+{
+	background-color: #0080FF;
+}
+
+.packet_list
+{
+	border-collapse: collapse;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+table.ws_border
+{
+	border: 2px solid grey;
+}
+
+.packet_list th, .packet_list td, td.ws_border
+{
+	border-right: 1px solid grey;
+}
+
+#ws_packet_detail_view ul
+{
+	list-style-type: none;
+	padding-left: 0px;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+#ws_packet_detail_view span.tree_expander
+{
+	margin-left: -13px;
+}
+
+#packet_list_header tr, tr.header
+{
+	color: grey;
+	white-space:  nowrap;
+}
+
+#packet_list_frames td
+{
+	white-space:  nowrap;
+}
+
+.ws_gui_text_valid      { background-color: #b0ffb0; }
+.ws_gui_text_deprecated { background-color: #ffffb0; }
+.ws_gui_text_invalid    { background-color: #ffb0b0; }
+
+.ws_cell_protocol             { background-color: #E5E5E5; }
+.ws_cell_link                 { color: blue; text-decoration: underline; } /* render_as_url() */
+.ws_cell_expert_color_Comment { background-color: #b7f8f4; }
+.ws_cell_expert_color_Chat    { background-color: #80b7f7; }
+.ws_cell_expert_color_Note    { background-color: #a0ffff; }
+.ws_cell_expert_color_Warning { background-color: #f7f253; }
+.ws_cell_expert_color_Error   { background-color: #ff5c5c; }
+
+ul.menul
+{
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+ul.menul li
+{
+	float: left;
+	padding-right: 15px;
+}
+
+ul.menul li a
+{
+	color: black;
+	display: block;
+	text-decoration: none;
+	float: left;
+	padding-left:  10px;
+	padding-right: 10px;
+}
+
+ul.menul li a:hover
+{
+	background-color: #0080FF;
+}
+
+ul.proto
+{
+	list-style-type: none;
+	padding-left: 32px;
+}
+
+li.proto
+{
+	background-color: #ccc;
+	margin-right: 5px;
+	border: 2px solid grey;
+}
+
+span.example
+{
+	background-color: #adff2f;
+}
+
+div.submenu
+{
+	display: none;
+	border: 2px solid grey;
+	position: absolute;
+	background-color: #f9f9f9;
+}
+
+div.submenu li, div.submenu li a
+{
+	float: none;
+}
+
+.follow_frame_no
+{
+	margin: 0px;
+	margin-top: 8px;
+	font-size: 14px;
+	text-align: center;
+}
+
+.follow_server_tag
+{
+	margin: 0px;
+	margin-bottom: 8px;
+	color: #00007f;            /* gui.stream.server.fg */
+	background-color: #ededfb; /* gui.stream.server.bg */
+}
+
+.follow_client_tag
+{
+	margin: 0px;
+	margin-bottom: 8px;
+	color: #7f0000;            /* gui.stream.client.fg */
+	background-color: #fbeded; /* gui.stream.client.bg */
+}
+
+text.seq_ts
+{
+	font-size: 9px;
+	text-anchor: start;
+}
+
+text.seq_host
+{
+	font-size: 12px;
+	text-anchor: middle;
+}
+
+text.seq_label
+{
+	font-size: 12px;
+	text-anchor: middle;
+}
+
+line.seq_line
+{
+	stroke-width: 1.5px;
+}
+
+.c3-area {
+	opacity: 1 !important;
+}
