@@ -3,7 +3,9 @@
 # node-webshark
 webShark for NodeJS
 
-webShark is a Wireshark-like web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd). This projects aims at porting the original webshark API/UI to NodeJS and improve its capabilities and input methods to support PCAP storage backends APIs such as Stenographer and others.
+webShark is a Wireshark-like web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) 
+
+This projects aims at porting the original webshark python API and UI to NodeJS, as well as improving its capabilities and input methods to support PCAP storage backends APIs such as Stenographer and others.
 
 ## Status
 Work in progress. Nothing to see.
@@ -23,3 +25,5 @@ browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webs
 
 ### Credits
 Based on [webshark](https://bitbucket.org/jwzawadzki/webshark) by [Jakub Zawadzki](https://bitbucket.org/jwzawadzki)
+
+Dissections powered by tshark [sharkd](https://wiki.wireshark.org/Development/sharkd) from Wireshark Project
