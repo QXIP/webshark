@@ -1,7 +1,9 @@
+<img src=https://user-images.githubusercontent.com/1423657/58752485-dd646c00-84af-11e9-94e9-c18529103638.png width=220>
+
 # node-webshark
 webShark for NodeJS
 
-This projects aims at porting the original webshark API to NodeJS and improve its capabilities and input methods.
+This projects aims at porting the original webshark API/UI to NodeJS and improve its capabilities and input methods.
 
 ## Status
 Work in progress. Nothing to see.
