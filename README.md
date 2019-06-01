@@ -22,6 +22,9 @@ docker run -v `pwd`:/out:/out --rm -it sharkd:latest
 browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webshark-app.js
 ```
 
+## Commands
+### sharkd
+Known commands are available on the [wiki](https://github.com/QXIP/node-webshark/wiki)
 
 ### Credits
 This program is free software based on GPLv2 [webshark](https://bitbucket.org/jwzawadzki/webshark) by [Jakub Zawadzki](https://bitbucket.org/jwzawadzki). 
