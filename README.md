@@ -3,7 +3,7 @@
 # node-webshark
 webShark for NodeJS
 
-![image](https://user-images.githubusercontent.com/1423657/58755566-8f1e8f80-84e6-11e9-97f5-ddc96e7e424d.png)
+![image](https://user-images.githubusercontent.com/1423657/58755571-be350100-84e6-11e9-8fc6-1a724808ee68.png)
 
 webShark is a Wireshark-like web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) 
 
