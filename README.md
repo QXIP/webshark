@@ -14,8 +14,8 @@ Work in progress. Nothing to see.
 
 
 ## Build Notes
-<<<<<<< HEAD
 ### docker
+Build a container with `sharkd` and `node-webshark` bundled
 ```
 docker build -t webshark:latest .
 ```
