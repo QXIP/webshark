@@ -14,6 +14,19 @@ module.exports = function (fastify, opts, next) {
   fastify.get('/webshark/json', function (request, reply) {
 
     if (request.query && "req" in request.query) {
+      
+      if (request.query.req === 'files') {
+        let files = fs.readdirSync(CAPTURES_PATH);
+        let results = {"files":[], "pwd": "."};
+        files.forEach(function(pcap_file){
+          if (pcap_file.endsWith('.pcap')) {
+            let pcap_stats = fs.statSync(CAPTURES_PATH + pcap_file);
+            results.files.push({"name": pcap_file, "size": pcap_stats.size});
+          }
+        });
+        return reply.send(JSON.stringify(results));
+      }
+
       if (request.query.req === 'download') {
         if ("capture" in request.query) {
           if (request.query.capture.includes('..')) {
