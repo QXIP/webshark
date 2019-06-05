@@ -14,7 +14,7 @@ Work in progress. Nothing to see.
 
 
 ## Build Notes
-
+<<<<<<< HEAD
 ### docker
 ```
 docker build -t webshark:latest .
