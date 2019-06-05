@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM node:8-stretch
 MAINTAINER Jakub Zawadzki <darkjames-ws@darkjames.pl>
 RUN apt-get update && apt-get install -y \
 	git make python3 cmake flex bison libglib2.0-dev libgcrypt20-dev \

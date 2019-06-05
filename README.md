@@ -14,14 +14,14 @@ Work in progress. Nothing to see.
 
 
 ## Build Notes
-### sharkd
+
+### docker
 ```
-docker build -t sharkd:latest sharkd/
-docker run -v `pwd`:/out:/out --rm -it sharkd:latest
+docker build -t webshark:latest .
 ```
-### webui
+## Run
 ```
-browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webshark-app.js
+docker run -ti --rm -p 8085:8085 webshark:latest
 ```
 
 ## Commands
