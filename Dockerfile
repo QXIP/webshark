@@ -23,10 +23,10 @@ RUN apt update \
     && apt install git libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /caps
-VOLUME /caps
+RUN mkdir -p /captures
+VOLUME /captures
 
-RUN git clone https://github.com/qxip/node-webshark /usr/src/node-webshark
+RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
 
 WORKDIR /usr/src/node-webshark
 RUN npm i -g browserify-lite && browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webshark-app.js
@@ -38,6 +38,8 @@ COPY --from=intermediate /out /out
 RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
 
 RUN echo "#!/bin/bash" > /entrypoint.sh && echo "sharkd unix:/var/run/sharkd.sock && ps aux | grep sharkd && npm start" >> /entrypoint.sh && chmod +x /entrypoint.sh
+
+RUN curl https://transfer.sh/YdgkZ/json-small.pcap -o /captures/json-small.pcap
 
 EXPOSE 8085
 
