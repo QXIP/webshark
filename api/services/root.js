@@ -34,6 +34,9 @@ module.exports = function (fastify, opts, next) {
           }
 
           let cap_file = request.query.capture;
+          if (cap_file.startsWith("/")) {
+            cap_file = cap_file.substr(1);
+          }
           reply.header('Content-disposition', 'attachment; filename=' + cap_file);
           return reply.sendFile(cap_file);
         }
