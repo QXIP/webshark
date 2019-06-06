@@ -14,6 +14,11 @@ Work in progress. Nothing to see.
 
 
 ## Instructions
+### Clone
+```
+git clone https://github.com/QXIP/node-webshark
+cd node-webshark
+```
 ### Build
 Build a container with `sharkd` and `node-webshark` bundled
 ```
