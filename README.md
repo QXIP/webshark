@@ -1,13 +1,12 @@
 <img src=https://user-images.githubusercontent.com/1423657/58752485-dd646c00-84af-11e9-94e9-c18529103638.png width=220>
 
 # node-webshark
-webShark for NodeJS
+
+**webShark** is a *Wireshark-like* web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) and featuring all its dissectors.
+
+This projects implements the original webShark API in NodeJS, improving its capabilities and input methods to support PCAP storage backends APIs such as Stenographer and others.
 
 ![image](https://user-images.githubusercontent.com/1423657/58755588-094f1400-84e7-11e9-9a3e-b2dfb27b6d74.png)
-
-**webShark** is a Wireshark-like web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) 
-
-This projects implements the webShark API in NodeJS, improving its capabilities and input methods to support PCAP storage backends APIs such as Stenographer and others.
 
 ## Status
 Work in progress. Nothing to see.
