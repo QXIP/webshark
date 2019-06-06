@@ -13,16 +13,19 @@ This projects aims at porting the original webshark python API and UI to NodeJS,
 Work in progress. Nothing to see.
 
 
-## Build Notes
-### docker
+## Instructions
+### Build
 Build a container with `sharkd` and `node-webshark` bundled
 ```
 docker build -t webshark:latest .
 ```
-## Run
+#### Run
+Mount your PCAP content directory to location `/capture` and launch
 ```
-docker run -ti --rm -p 8085:8085 webshark:latest
+docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
 ```
+#### Test
+Browse to your webshark instance, ie: `http://localhost:8085/webshark`
 
 ## Commands
 ### sharkd
