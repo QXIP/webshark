@@ -26,7 +26,8 @@ RUN apt update \
 RUN mkdir -p /captures
 VOLUME /captures
 
-RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
+# RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
+COPY . /usr/src/node-webshark
 
 WORKDIR /usr/src/node-webshark
 RUN npm i -g browserify-lite && browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webshark-app.js
