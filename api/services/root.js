@@ -62,6 +62,12 @@ module.exports = function (fastify, opts, next) {
             reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
           }
         }
+      } else if (
+        request.query.req === 'tap' &&
+        'tap0' in request.query && 
+        ['srt:dcerpc', 'srt:rpc', 'srt:scsi', 'rtd:megaco'].includes(request.query.tap0) // catch the four invalid requests and prevent socket failure
+      ) {
+        reply.send(null);
       } else {
         sharkd_dict.send_req(request.query).then((data) => {
           reply.send(data);
