@@ -17,11 +17,12 @@
   "author": "joviniko@gmail.com",
   "license": "GPLv2",
   "dependencies": {
+    "async-lock": "^1.2.0",
     "fastify": "^2.0.0",
     "fastify-autoload": "^0.6.0",
     "fastify-cli": "^1.0.0",
-    "fastify-plugin": "^1.5.0",
     "fastify-file-upload": "^1.0.0",
+    "fastify-plugin": "^1.5.0",
     "fastify-static": "^2.4.0",
     "promise-socket": "^4.0.1"
   },

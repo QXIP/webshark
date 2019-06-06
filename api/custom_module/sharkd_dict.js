@@ -3,6 +3,8 @@ var sharkd_objects = {};
 const SHARKD_SOCKET = process.env.SHARKD_SOCKET || "/var/run/sharkd.sock";
 const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
 const fs = require('fs');
+var AsyncLock = require('async-lock');
+var lock = new AsyncLock({timeout: 180000}); // 3 minutes timeout for the lock
 
 get_loaded_sockets = function() {
   return Object.keys(sharkd_objects)
@@ -45,6 +47,7 @@ function _str_is_json(str) {
 }
 
 send_req = async function(request, sock) {
+  
   let cap_file = '';
   
   if ("capture" in request) {
@@ -65,27 +68,29 @@ send_req = async function(request, sock) {
         return JSON.stringify({"err": 1, "errstr": "Nope"});
     }
   }
-
-  let new_sock = sock;
-
-  if (typeof(new_sock) === 'undefined') {
-    new_sock = await get_sharkd_cli(cap_file);
-  }
-
-  if (new_sock === null) {
-    return JSON.stringify({"err": 1, "errstr": `cannot connect to sharkd using socket: ${SHARKD_SOCKET}`});
-  }
   
+  async function _send_req_internal() {
+    let new_sock = sock;
+    if (typeof(new_sock) === 'undefined') {
+      new_sock = await get_sharkd_cli(cap_file);
+    }
   
-  await new_sock.write(JSON.stringify(request)+"\n");
-  let data = '';
-  let chunk = await new_sock.read();
-  data += chunk;
-  while (_str_is_json(data) === false) {
-    chunk = await new_sock.read();
+    if (new_sock === null) {
+      return JSON.stringify({"err": 1, "errstr": `cannot connect to sharkd using socket: ${SHARKD_SOCKET}`});
+    }
+    
+    await new_sock.write(JSON.stringify(request)+"\n");
+    let data = '';
+    let chunk = await new_sock.read();
     data += chunk;
+    while (_str_is_json(data) === false) {
+      chunk = await new_sock.read();
+      data += chunk;
+    }
+    return data;
   }
-  return data;
+
+  return await lock.acquire(cap_file, _send_req_internal);
 }
 
 exports.get_sharkd_cli = get_sharkd_cli;

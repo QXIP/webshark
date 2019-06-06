@@ -28,13 +28,11 @@ module.exports = function (fastify, opts, next) {
             }
           }
         });
-        return reply.send(JSON.stringify(results));
-      }
-      
-      if (request.query.req === 'download') {
+        reply.send(JSON.stringify(results));
+      } else if (request.query.req === 'download') {
         if ("capture" in request.query) {
           if (request.query.capture.includes('..')) {
-            return JSON.stringify({"err": 1, "errstr": "Nope"});
+            reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
           }
 
           let cap_file = request.query.capture;
@@ -43,28 +41,33 @@ module.exports = function (fastify, opts, next) {
           }
 
           if ("token" in request.query) {
-            
             if (request.query.token === "self") {
               reply.header('Content-disposition', 'attachment; filename=' + cap_file);
-              return reply.sendFile(cap_file);
-            } else {
+              reply.sendFile(cap_file);
+              next();
+            } else if (request.query.token.startsWith("rtp")) {
               sharkd_dict.send_req(request.query).then((data) => {
-                data = JSON.parse(data);
-                reply.header('Content-Type', data.mime);
-                reply.header('Content-disposition', 'attachment; filename="' + data.file + '"');
-                let buff = new Buffer(data.data, 'base64');  
-                return reply.send(buff);
+                try {
+                  data = JSON.parse(data);
+                  reply.header('Content-Type', data.mime);
+                  reply.header('Content-disposition', 'attachment; filename="' + data.file + '"');
+                  let buff = new Buffer(data.data, 'base64');
+                  reply.send(buff);
+                } catch (err) {
+                  reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
+                }
               });
+            } else {
+              reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
             }
-            return JSON.stringify({"err": 1, "errstr": "Nope"});
           }
         }
+      } else {
+        sharkd_dict.send_req(request.query).then((data) => {
+          reply.send(data);
+        });
       }
     }
-
-    sharkd_dict.send_req(request.query).then((data) => {
-      reply.send(data);
-    });
   })
 
   next()
