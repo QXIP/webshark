@@ -45,7 +45,7 @@ module.exports = function (fastify, opts, next) {
               reply.header('Content-disposition', 'attachment; filename=' + cap_file);
               reply.sendFile(cap_file);
               next();
-            } else if (request.query.token.startsWith("rtp")) {
+            } else {
               sharkd_dict.send_req(request.query).then((data) => {
                 try {
                   data = JSON.parse(data);
@@ -57,9 +57,9 @@ module.exports = function (fastify, opts, next) {
                   reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
                 }
               });
-            } else {
-              reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
             }
+          } else {
+            reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
           }
         }
       } else {

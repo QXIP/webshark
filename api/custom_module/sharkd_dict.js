@@ -47,7 +47,6 @@ function _str_is_json(str) {
 }
 
 send_req = async function(request, sock) {
-  
   let cap_file = '';
   
   if ("capture" in request) {
