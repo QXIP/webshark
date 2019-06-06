@@ -4,9 +4,17 @@ const SHARKD_SOCKET = process.env.SHARKD_SOCKET || "/var/run/sharkd.sock";
 const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
 const fs = require('fs');
 
+get_loaded_sockets = function() {
+  return Object.keys(sharkd_objects)
+}
+
 get_sharkd_cli = async function(capture) {
-  if (capture in sharkd_objects) {
-    return sharkd_objects[capture];
+  let socket_name = capture.replace(CAPTURES_PATH,"");
+  if (socket_name.startsWith("/")) {
+    socket_name = socket_name.substr(1);
+  }
+  if (socket_name in sharkd_objects) {
+    return sharkd_objects[socket_name];
   } else {
     let new_socket = new PromiseSocket();
     new_socket.stream.setEncoding('utf8');
@@ -16,13 +24,13 @@ get_sharkd_cli = async function(capture) {
     catch(err) {
       return null;
     }
-    sharkd_objects[capture] = new_socket;
+    sharkd_objects[socket_name] = new_socket;
     
     if(capture !== '') {
-      await send_req({'req':'load', 'file': capture}, sharkd_objects[capture]);
-      return sharkd_objects[capture];
+      await send_req({'req':'load', 'file': capture}, sharkd_objects[socket_name]);
+      return sharkd_objects[socket_name];
     } else {
-      return sharkd_objects[capture];
+      return sharkd_objects[socket_name];
     }
   }
 }
@@ -43,6 +51,13 @@ send_req = async function(request, sock) {
     if (request.capture.includes('..')) {
       return JSON.stringify({"err": 1, "errstr": "Nope"});
     }
+
+    let req_capture = request.capture;
+
+    if (req_capture.startsWith("/")) {
+      req_capture = req_capture.substr(1);
+    }
+
     cap_file = `${CAPTURES_PATH}${request.capture}`;
 
     // verify that pcap exists
@@ -81,3 +96,4 @@ send_req = async function(request, sock) {
 
 exports.get_sharkd_cli = get_sharkd_cli;
 exports.send_req = send_req;
+exports.get_loaded_sockets = get_loaded_sockets;

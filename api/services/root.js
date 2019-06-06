@@ -18,10 +18,15 @@ module.exports = function (fastify, opts, next) {
       if (request.query.req === 'files') {
         let files = fs.readdirSync(CAPTURES_PATH);
         let results = {"files":[], "pwd": "."};
+        let loaded_files = sharkd_dict.get_loaded_sockets();
         files.forEach(function(pcap_file){
           if (pcap_file.endsWith('.pcap')) {
             let pcap_stats = fs.statSync(CAPTURES_PATH + pcap_file);
-            results.files.push({"name": pcap_file, "size": pcap_stats.size});
+            if (loaded_files.includes(pcap_file)) {
+              results.files.push({"name": pcap_file, "size": pcap_stats.size, "status": {"online": true}});
+            } else {
+              results.files.push({"name": pcap_file, "size": pcap_stats.size});
+            }
           }
         });
         return reply.send(JSON.stringify(results));
