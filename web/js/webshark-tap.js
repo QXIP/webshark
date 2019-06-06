@@ -71,7 +71,7 @@ function webshark_tap_row_on_click_analyse(node, anal)
 			tap_table.id = '';
 			tap_extra.id = 'ws_tap_table';
 
-			for (var i = 0; i < data['taps'].length - 1; i++)
+			for (var i = 0; i < data['taps'].length; i++)
 				webshark_render_tap(data['taps'][i]);
 
 			tap_table.id = 'ws_tap_table';
@@ -1228,7 +1228,7 @@ function webshark_load_tap(taps)
 	window.webshark.webshark_json_get(tap_req,
 		function(data)
 		{
-			for (var i = 0; i < data['taps'].length - 1; i++)
+			for (var i = 0; i < data['taps'].length; i++)
 				webshark_render_tap(data['taps'][i]);
 		});
 }
