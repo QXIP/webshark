@@ -75,13 +75,7 @@ send_req = async function(request, sock) {
   if (new_sock === null) {
     return JSON.stringify({"err": 1, "errstr": `cannot connect to sharkd using socket: ${SHARKD_SOCKET}`});
   }
-
-  //dont allow req=download
-  if ("req" in request) {
-    if (request.req === 'download') {
-      return JSON.stringify({"err": 1, "errstr": "Nope"});
-    }
-  }
+  
   
   await new_sock.write(JSON.stringify(request)+"\n");
   let data = '';

@@ -14,7 +14,6 @@ module.exports = function (fastify, opts, next) {
   fastify.get('/webshark/json', function (request, reply) {
 
     if (request.query && "req" in request.query) {
-      
       if (request.query.req === 'files') {
         let files = fs.readdirSync(CAPTURES_PATH);
         let results = {"files":[], "pwd": "."};
@@ -31,7 +30,7 @@ module.exports = function (fastify, opts, next) {
         });
         return reply.send(JSON.stringify(results));
       }
-
+      
       if (request.query.req === 'download') {
         if ("capture" in request.query) {
           if (request.query.capture.includes('..')) {
@@ -42,10 +41,24 @@ module.exports = function (fastify, opts, next) {
           if (cap_file.startsWith("/")) {
             cap_file = cap_file.substr(1);
           }
-          reply.header('Content-disposition', 'attachment; filename=' + cap_file);
-          return reply.sendFile(cap_file);
+
+          if ("token" in request.query) {
+            
+            if (request.query.token === "self") {
+              reply.header('Content-disposition', 'attachment; filename=' + cap_file);
+              return reply.sendFile(cap_file);
+            } else {
+              sharkd_dict.send_req(request.query).then((data) => {
+                data = JSON.parse(data);
+                reply.header('Content-Type', data.mime);
+                reply.header('Content-disposition', 'attachment; filename="' + data.file + '"');
+                let buff = new Buffer(data.data, 'base64');  
+                return reply.send(buff);
+              });
+            }
+            return JSON.stringify({"err": 1, "errstr": "Nope"});
+          }
         }
-        return reply.send(JSON.stringify({"err": 1, "errstr": "Nope test"}));
       }
     }
 
