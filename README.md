@@ -32,6 +32,13 @@ docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
 #### Test
 Browse to your webshark instance, ie: `http://localhost:8085/webshark`
 
+###### TCP Flows
+![image](https://user-images.githubusercontent.com/1423657/59044920-5c2a2200-887f-11e9-8f5c-b227290f7806.png)
+
+###### RTP Streams
+![image](https://user-images.githubusercontent.com/1423657/59044655-d312eb00-887e-11e9-84f3-d8960d58fc05.png)
+
+
 ## Commands
 #### sharkd
 Known commands are available on the [wiki](https://github.com/QXIP/node-webshark/wiki)
