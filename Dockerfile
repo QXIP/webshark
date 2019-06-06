@@ -1,7 +1,7 @@
 FROM node:8-stretch as intermediate
 
 RUN apt-get update && apt-get install -y \
-	git make python3 cmake flex bison libglib2.0-dev libgcrypt20-dev \
+	git make python3 cmake flex bison libglib2.0-dev libgcrypt20-dev libspeex-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /out
@@ -19,8 +19,10 @@ RUN ../node-webshark/sharkd/build.sh
 
 FROM node:8-stretch
 
+ENV serial 08120874
+
 RUN apt update \
-    && apt install git libglib2.0-0 \
+    && apt install -y git libglib2.0-0 speex libspeex-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /captures
