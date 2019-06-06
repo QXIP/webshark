@@ -43,6 +43,6 @@ Browse to your webshark instance, ie: `http://localhost:8085/webshark`
 Known commands are available on the [wiki](https://github.com/QXIP/node-webshark/wiki)
 
 #### Credits
-This program is free software based on GPLv2 [webshark](https://bitbucket.org/jwzawadzki/webshark) by [Jakub Zawadzki](https://bitbucket.org/jwzawadzki). 
+This program is free software based on a fork of GPLv2 [webshark](https://bitbucket.org/jwzawadzki/webshark) by [Jakub Zawadzki](https://bitbucket.org/jwzawadzki) and sponsored by [QXIP](https://github.com/QXIP) and [CUBRO](http://cubro.com)
 
 Dissections powered by tshark [sharkd](https://wiki.wireshark.org/Development/sharkd) from Wireshark Project. See [LICENSE](https://github.com/QXIP/node-webshark/blob/master/LICENSE) for details
