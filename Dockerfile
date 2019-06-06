@@ -37,10 +37,12 @@ RUN npm install && npm audit fix
 COPY --from=intermediate /out /out
 RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
 
-RUN echo "#!/bin/bash" > /entrypoint.sh && echo "sharkd unix:/var/run/sharkd.sock && ps aux | grep sharkd && npm start" >> /entrypoint.sh && chmod +x /entrypoint.sh
+ENV CAPTURES_PATH=/captures/
 
-RUN curl https://transfer.sh/YdgkZ/json-small.pcap -o /captures/json-small.pcap
-
+RUN echo "#!/bin/bash" > /entrypoint.sh && \
+    echo "sharkd unix:/var/run/sharkd.sock && ps aux | grep sharkd &&" >> /entrypoint.sh && \
+    echo "CAPTURES_PATH=/captures/ npm start" >> /entrypoint.sh && chmod +x /entrypoint.sh
+    
 EXPOSE 8085
 
 ENTRYPOINT [ "/entrypoint.sh" ]
