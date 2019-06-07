@@ -19,10 +19,15 @@ module.exports = function (fastify, opts, next) {
 
         fileArr.push({
           name: files[key].name,
-          mimetype: files[key].mimetype
+          mimetype: files[key].mimetype,
+          size: files[key].size
         })
     }
-    reply.code(200).send(fileArr)
+    if (fileArr.length === 1) {
+      reply.code(200).send(fileArr[0])
+    } else {
+      reply.code(200).send(fileArr)
+    }
   })
 
   next()
