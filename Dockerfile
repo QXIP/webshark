@@ -28,6 +28,11 @@ RUN apt update \
 RUN mkdir -p /captures
 VOLUME /captures
 
+COPY --from=intermediate /out /out
+RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
+
+ENV CAPTURES_PATH=/captures/
+
 # RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
 COPY . /usr/src/node-webshark
 
@@ -37,13 +42,7 @@ RUN npm i -g browserify-lite && browserify-lite --standalone webshark ./web/js/w
 WORKDIR /usr/src/node-webshark/api
 RUN npm install && npm audit fix
 
-COPY --from=intermediate /out /out
-RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
-
-ENV CAPTURES_PATH=/captures/
-
 RUN echo "#!/bin/bash" > /entrypoint.sh && \
-    echo "sharkd unix:/var/run/sharkd.sock && ps aux | grep sharkd &&" >> /entrypoint.sh && \
     echo "CAPTURES_PATH=/captures/ npm start" >> /entrypoint.sh && chmod +x /entrypoint.sh
     
 EXPOSE 8085
