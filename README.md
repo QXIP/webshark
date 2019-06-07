@@ -24,7 +24,7 @@ Build a container with `sharkd` and `node-webshark` bundled
 docker build -t webshark:latest .
 ```
 #### Run
-Mount your PCAP content directory to location `/capture` and launch
+Mount your PCAP content directory to location `/captures` and launch
 ```
 docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
 ```
