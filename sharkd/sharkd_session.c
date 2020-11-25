@@ -643,6 +643,68 @@ sharkd_session_process_info(void)
 }
 
 /**
+ * sharkd_read_pcap_from_url()
+ *
+ * Dump the pcap from url
+ *
+ */
+#define FILENAME_LEN 1000
+int
+sharkd_read_pcap_from_url(char *url, char *new_file)
+{
+	if(url == NULL || new_file == NULL)
+		return -1;
+	
+	CURL *curl;
+	CURLcode res;
+	FILE *fp;
+	char ext[5] = {0};
+	int ret, len = 0;	
+	
+	/* check extension (pcap-cap-pcang) */
+	if(strstr(url, "pcap"))
+		memcpy(ext, "pcap", 4);
+	else if(strstr(url, "cap"))
+		memcpy(ext, "cap", 3);
+	else if(strstr(url, "pcapng"))
+		memcpy(ext, "pcapng", 6);
+	else {
+		fprintf(stderr, "Extension not allowed\n");
+		return -1;
+	}
+	
+	/* give new name base on time */
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);    
+	snprintf(new_file, FILENAME_LEN, "%d-%02d-%02d-%02d:%02d:%02d.%s",
+		 tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ext);
+	
+	/* INIT CURL */
+	curl = curl_easy_init();
+	
+	if(curl) {
+		fp = fopen(new_file, "wb");
+		if(fp == NULL) {
+			fprintf(stderr, "Cannot open file\n");
+			return -1;
+		}
+		/* SETOPT */
+		curl_easy_setopt(curl, CURLOPT_URL,           url);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_cb);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA,     fp);
+		res = curl_easy_perform(curl);
+		if(res != 0) {
+			fprintf(stderr, "error on curl_easy_perform function\n");
+			return -1;
+		}
+		/* CLEANUP */
+		curl_easy_cleanup(curl);
+		fclose(fp);
+	}
+	return 0;
+}
+
+/**
  * sharkd_session_process_load()
  *
  * Process load request
@@ -658,18 +720,37 @@ sharkd_session_process_load(const char *buf, const jsmntok_t *tokens, int count)
 {
 	const char *tok_file = json_find_attr(buf, tokens, count, "file");
 	int err = 0;
-
-	fprintf(stderr, "load: filename=%s\n", tok_file);
-
+	
 	if (!tok_file)
 		return;
+	
+	fprintf(stderr, "load: filename=%s\n", tok_file);
+	
+	/* if tok_file == url -> call sharkd_read_pcap_from_url() */
+	/* TODO check the pcap path */
+	if((strstr(tok_file, "://") == NULL))
+	{
+		char new_fileURL[FILENAME_LEN] = {0};
+		int ret;
+		ret = sharkd_read_pcap_from_url(tok_file, new_fileURL);
+		if(ret == -1) {
+			fprintf(stderr, "error on read pcap from URL [%s]\n", tok_file);
+			return;
+		}
 
-	if (sharkd_cf_open(tok_file, WTAP_TYPE_AUTO, FALSE, &err) != CF_OK)
+		// call sharkd_cf_open with new file
+		if (sharkd_cf_open(new_fileURL, WTAP_TYPE_AUTO, FALSE, &err) != CF_OK)
+		{
+			sharkd_json_simple_reply(err, NULL);
+			return;
+		}
+	}
+	else if(sharkd_cf_open(tok_file, WTAP_TYPE_AUTO, FALSE, &err) != CF_OK)
 	{
 		sharkd_json_simple_reply(err, NULL);
 		return;
 	}
-
+	
 	TRY
 	{
 		err = sharkd_load_cap_file();
