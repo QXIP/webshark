@@ -8,22 +8,13 @@ This projects implements the original webShark API in NodeJS, improving its capa
 
 ![image](https://user-images.githubusercontent.com/1423657/58755588-094f1400-84e7-11e9-9a3e-b2dfb27b6d74.png)
 
-## Status
-Work in progress. Nothing to see.
-
 
 ## Instructions
-#### Clone
+#### Run with Compose
 ```
-git clone https://github.com/QXIP/node-webshark
-cd node-webshark
+docker-compose up -d
 ```
-#### Build
-Build a container with `sharkd` and `node-webshark` bundled
-```
-docker build -t webshark:latest .
-```
-#### Run
+#### Run Manually
 Mount your PCAP content directory to location `/captures` and launch
 ```
 docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
