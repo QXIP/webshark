@@ -435,7 +435,7 @@ function dom_find_node_attr(n, attr)
 	return null;
 }
 
-function webshark_json_get(req_data, cb)
+async function webshark_json_get(req_data, cb)
 {
 
         if(req_data.capture){
