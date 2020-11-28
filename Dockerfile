@@ -1,6 +1,6 @@
 FROM node:8-stretch as intermediate
 
-ENV serial 202098760
+ENV serial 202098761
 
 RUN apt-get update && apt-get install -y \
 	git make python3 cmake flex bison libglib2.0-dev libgcrypt20-dev libspeex-dev libc-ares-dev \

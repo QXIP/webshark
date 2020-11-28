@@ -19,8 +19,18 @@ p {
 {
 	margin-left: -8px;
 	padding-bottom: 4px;
-	background-color: #d8F8F8;
+	background: #5d8aad;
+	color: #FFFFFF;
+	text-transform: uppercase;	
 }
+
+#user_toolbar a:link,
+#user_toolbar a:visited,
+#user_toolbar a:hover,
+#user_toolbar a:active {
+  color: #FFFFFF;
+}
+
 
 .wsbutton
 {
@@ -64,7 +74,7 @@ li.selected
 {
 	border-collapse: collapse;
 	font-family: monospace;
-	font-size: 14px;
+	font-size: 16px;
 }
 
 table.ws_border
@@ -82,7 +92,7 @@ table.ws_border
 	list-style-type: none;
 	padding-left: 0px;
 	font-family: monospace;
-	font-size: 14px;
+	font-size: 16px;
 }
 
 #ws_packet_detail_view span.tree_expander
