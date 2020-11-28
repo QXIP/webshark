@@ -1,7 +1,18 @@
 'use strict'
 const fs = require('fs');
+const fetch = require("node-fetch");
 const sharkd_dict = require('../custom_module/sharkd_dict');
 const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
+
+const download = function(url, dest, cb) {
+  var file = fs.createWriteStream(dest);
+  var request = http.get(url, function(response) {
+    response.pipe(file);
+    file.on('finish', function() {
+      file.close(cb);  // close() is async, call cb after close completes.
+    });
+  });
+}
 
 
 module.exports = function (fastify, opts, next) {
@@ -18,8 +29,21 @@ module.exports = function (fastify, opts, next) {
         let files = fs.readdirSync(CAPTURES_PATH);
         let results = {"files":[], "pwd": "."};
         let loaded_files = sharkd_dict.get_loaded_sockets();
-        files.forEach(function(pcap_file){
+        files.forEach( async function(pcap_file){
           if (pcap_file.endsWith('.pcap')) {
+
+	    if(pcap_file.startsWith('http:')){
+		  const res = await fetch(pcap_file);
+                  var filename = pcap_file.split('/').pop()
+		  const fileStream = fs.createWriteStream(CAPTURES_PATH+filename);
+		  await new Promise((resolve, reject) => {
+		      res.body.pipe(fileStream);
+		      res.body.on("error", reject);
+		      fileStream.on("finish", resolve);
+		    });
+		  pcap_file=filename;
+	    }
+
             let pcap_stats = fs.statSync(CAPTURES_PATH + pcap_file);
             if (loaded_files.includes(pcap_file)) {
               results.files.push({"name": pcap_file, "size": pcap_stats.size, "status": {"online": true}});

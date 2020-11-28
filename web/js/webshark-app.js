@@ -455,6 +455,7 @@
 
 	  if(req_data.capture){
 	    console.log('File Data Request',req_data.capture);
+	    try {
 	    var filename = req_data.capture;
 	    if( filename.startsWith('http') && filename.endsWith('.pcap') ){
 		var file = filename.split('/').pop().split('#')[0].split('?')[0];
@@ -471,6 +472,7 @@
 		req_data.capture = file;
 		console.log('---------------- new req',req_data);
 	    }
+	    } catch(e) { console.log(e); }
 	  }
 
 	  var http = new XMLHttpRequest();
