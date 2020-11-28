@@ -21,12 +21,12 @@ cd node-webshark
 #### Build
 Build a container with `sharkd` and `node-webshark` bundled
 ```
-docker build -t webshark:latest .
+docker build -t qxip/webshark:latest .
 ```
 #### Run
 Mount your PCAP content directory to location `/captures` and launch
 ```
-docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
+docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures qxip/webshark:latest
 ```
 #### Test
 Browse to your webshark instance, ie: `http://localhost:8085/webshark`

@@ -1,6 +1,6 @@
 FROM node:8-stretch as intermediate
 
-ENV serial 08120875
+ENV serial 08120876
 
 RUN apt-get update && apt-get install -y \
 	git make python3 cmake flex bison libglib2.0-dev libgcrypt20-dev libspeex-dev \
@@ -21,7 +21,7 @@ RUN ../node-webshark/sharkd/build.sh
 
 FROM node:10-stretch
 
-ENV serial 08120875
+ENV serial 08120876
 
 RUN apt update \
     && apt install -y git libglib2.0-0 speex libspeex-dev \
