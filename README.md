@@ -10,14 +10,15 @@ This projects implements the original webShark API in NodeJS, improving its capa
 
 
 ## Instructions
+Mount your PCAP content directory to location `/captures` and launch webshark
+
 #### Run with Compose
 ```
 docker-compose up -d
 ```
 #### Run Manually
-Mount your PCAP content directory to location `/captures` and launch
 ```
-docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures webshark:latest
+docker run -ti --rm -p 8085:8085 -v $(pwd)/captures:/captures qxip/webshark
 ```
 #### Test
 Browse to your webshark instance, ie: `http://localhost:8085/webshark`
