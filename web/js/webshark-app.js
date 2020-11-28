@@ -58,6 +58,7 @@
   
   Webshark.prototype.load = function(filename, cb)
   {
+
 	  var req_status =
 		  {
 			  req: 'status',
@@ -449,16 +450,34 @@
 	  return null;
   }
   
-  function webshark_json_get(req_data, cb)
+  async function webshark_json_get(req_data, cb)
   {
+
+	  if(req_data.capture){
+	    console.log('File Data Request',req_data.capture);
+	    var filename = req_data.capture;
+	    if( filename.startsWith('http') && filename.endsWith('.pcap') ){
+		var file = filename.split('/').pop().split('#')[0].split('?')[0];
+		console.log('---------------- found remote pcap url', filename, file);
+		var cors = "http://cors-anywhere.herokuapp.com/";
+		var pcap = await fetch(cors+filename, { method: 'GET', mode: 'cors'})
+				.then(response => response.blob())
+		console.log('---------------- downloaded remote pcap', file, pcap);
+		if(pcap.size == 0) { console.log('zero size'); return; }
+		var formData = new FormData();
+		formData.append('f', pcap, file);
+		var res = await fetch("/webshark/upload", { method: 'POST', body: formData });
+		console.log('---------------- uploaded remote pcap', res, file);
+		req_data.capture = file;
+		console.log('---------------- new req',req_data);
+	    }
+	  }
+
 	  var http = new XMLHttpRequest();
-  
 	  var url = webshark_create_api_url(req_data);
-  
 	  var req = JSON.stringify(req_data);
-  
 	  debug(3, " webshark_json_get(" + req + ") sending request");
-  
+
 	  http.open("GET", url, true);
 	  http.onreadystatechange =
 		  function()
