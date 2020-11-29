@@ -542,9 +542,10 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 
 <body onload="load()"><div id="ws_div" style="display: none;">
 	<div id="user_toolbar">
-		<a href="/webshark">Webshark</a>
+		<a href="/webshark"><img src="https://user-images.githubusercontent.com/1423657/100527621-31026380-31d4-11eb-9b61-17f302ae9b1e.png" width="40" style="vertical-align: middle;">webshark</a>
 
-		<div style="float: right; margin-right: 5px;">
+		<div style="float: right; margin-right: 5px;vertical-align: middle;">
+			<span id="toolbar_capture_description" style="margin-right: 10px;"></span>
 			<span id="user_anon" style="display: none;">
 				Guest
 				<a href="/login">Login</a>
@@ -587,10 +588,10 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 		<div style="float: left;">
 			<a id="toolbar_capture_files"></a>
 			<a id="toolbar_capture_settings"></a>
-			<span id="toolbar_capture_description"></span>
 			<a id="toolbar_capture_down"></a>
-			<p />
 			<input id="display_filter" placeholder="Apply a display filter" type='text' onchange='set_filter(this.value);' style='width: 550px;' />
+
+			<p />
 
 			<ul class="menul">
 			<li>
@@ -686,11 +687,11 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 		<input id="field_filter" placeholder="Apply a field filter" type='text' onchange='set_field_filter(this.value);' style='width: 350px;' />
 	</div>
 
-	<div id="ws_packet_detail_view" style='overflow: auto; width: 100%; height: 250px; border: 2px solid grey; float: left;'>
-Select frame
+	<div id="ws_packet_detail_view" style='overflow: auto; width: 100%; height: 350px; border: 2px solid grey; float: left;'>
+	Select frame
 	</div>
 
-	<div id="ws_packet_bytes_view" style='overflow: auto; width: 100%; height: 200px; border: 2px solid grey; float: right;'>
+	<div id="ws_packet_bytes_view" style='overflow: auto; width: 100%; height: 350px; border: 2px solid grey; float: right;'>
 		<div id="ws_packet_pane" style="float: left;"></div>
 		<div style="float: right;">
 			<button id="packet_display_base_16" class="wsbutton selected" onclick="bytes_display_base(16)">Hex</button>

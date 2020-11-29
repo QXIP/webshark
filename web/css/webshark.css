@@ -21,7 +21,6 @@ p {
 	padding-bottom: 4px;
 	background: #5d8aad;
 	color: #FFFFFF;
-	text-transform: uppercase;	
 }
 
 #user_toolbar a:link,
@@ -29,6 +28,8 @@ p {
 #user_toolbar a:hover,
 #user_toolbar a:active {
   color: #FFFFFF;
+  text-decoration: none;
+  font-weight: bolder;
 }
 
 
@@ -47,7 +48,7 @@ p {
 
 button.selected, tr.selected
 {
-	background-color: #0080FF !important;
+	background-color: #0080FF7d !important;
 }
 
 span.hexdump_offset
@@ -57,7 +58,7 @@ span.hexdump_offset
 
 span.selected_bytes
 {
-	background-color: #0080FF;
+	background-color: #0080FF7d;
 }
 
 span.selected_proto
@@ -67,7 +68,7 @@ span.selected_proto
 
 li.selected
 {
-	background-color: #0080FF;
+	background-color: #0080ff7d;
 }
 
 .packet_list
@@ -147,7 +148,7 @@ ul.menul li a
 
 ul.menul li a:hover
 {
-	background-color: #0080FF;
+	background-color: #0080FF7d;
 }
 
 ul.proto
