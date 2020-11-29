@@ -6,6 +6,8 @@
 
 	<title>webshark ${WEBSHARK_VER}</title>
 
+	<link rel="icon" href="https://user-images.githubusercontent.com/1423657/100539020-8f126380-3233-11eb-9348-2ecb496cb58c.png" type="image/png" />
+
 	<link rel="stylesheet" href="css/webshark.css" type="text/css">
 	<link rel="stylesheet" href="css/awesomplete.css" type="text/css">
 
@@ -542,7 +544,7 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 
 <body onload="load()"><div id="ws_div" style="display: none;">
 	<div id="user_toolbar">
-		<a href="/webshark"><img src="https://user-images.githubusercontent.com/1423657/100527621-31026380-31d4-11eb-9b61-17f302ae9b1e.png" width="40" style="vertical-align: middle;">webshark</a>
+		<a href="/webshark"><img src="https://user-images.githubusercontent.com/1423657/100539020-8f126380-3233-11eb-9348-2ecb496cb58c.png" width="20" style="vertical-align: middle;margin-right: 5px;">&nbsp; webshark</a>
 
 		<div style="float: right; margin-right: 5px;vertical-align: middle;">
 			<span id="toolbar_capture_description" style="margin-right: 10px;"></span>
@@ -614,12 +616,15 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 			</li>
 		</ul>
 		</div>
+		<!--
 		<div style="float: right; border: 1px solid grey;">
 			<div id="capture_interval" style="margin-top: 2px;">
 				<svg width="620" height="100"></svg>
 			</div>
 			<div style="float: left;">
-				<span style="font-size: 12px;" id="capture_interval_descr"><!---Displaying XXX frames out of YYY.--></span>
+				<span style="font-size: 12px;" id="capture_interval_descr">
+					<!---Displaying XXX frames out of YYY.-->
+				</span>
 			</div>
 			<div style="float: right;">
 				<button id="capture_interval_bps" class="wsbutton selected" onclick="render_interval('bps')">Bytes</button>
@@ -627,6 +632,7 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 				<button id="capture_interval_adv" class="wsbutton" style="margin-left: 15px;" onclick="show_hide_graph('report_graph', 'capture_interval_adv')">Advanced Graph</button>
 			</div>
 		</div>
+		-->
 		<div style="clear: both;"></div>
 
 		<div id="report_graph" style="border: 2px solid grey; display: none;">
