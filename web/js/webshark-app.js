@@ -457,10 +457,9 @@
 	    console.log('File Data Request',req_data.capture);
 	    var filename = req_data.capture;
 	    if( filename.startsWith('http') && filename.endsWith('.pcap') ){
-		var file = filename.split('/').pop().split('#')[0].split('?')[0];
+		var file = new Date().getTime() + ".pcap";
 		console.log('---------------- found remote pcap url', filename, file);
-		var cors = "http://cors-anywhere.herokuapp.com/";
-		var pcap = await fetch(cors+filename, { method: 'GET', mode: 'cors'})
+		var pcap = await fetch(filename, { method: 'GET', mode: 'cors'})
 				.then(response => response.blob())
 		console.log('---------------- downloaded remote pcap', file, pcap);
 		if(pcap.size == 0) { console.log('zero size'); return; }

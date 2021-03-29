@@ -1,6 +1,6 @@
 {
   "name": "webshark-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "webShark/sharkd API backend",
   "main": "app.js",
   "directories": {
