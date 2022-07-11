@@ -1,6 +1,6 @@
 {
   "name": "webshark-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "webShark/sharkd API backend",
   "main": "app.js",
   "directories": {
@@ -24,7 +24,8 @@
     "fastify-file-upload": "^1.0.0",
     "fastify-plugin": "^1.5.0",
     "fastify-static": "^2.4.0",
-    "promise-socket": "^4.0.1"
+    "promise-socket": "^4.0.1",
+    "node-fetch": "^3.2.6"
   },
   "devDependencies": {
     "tap": "^12.5.3"
