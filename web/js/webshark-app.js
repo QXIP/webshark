@@ -61,7 +61,7 @@
 
 	  var req_status =
 		  {
-			  req: 'status',
+			  method: 'status',
 			  capture: filename
 		  };
   
@@ -173,7 +173,7 @@
   {
 	  var req_intervals =
 		  {
-			  req: 'intervals',
+			  method: 'intervals',
 			  capture: g_webshark_file
 		  };
   
@@ -210,7 +210,7 @@
   {
 	  var req_frames =
 		  {
-			  req: 'frames',
+			  method: 'frames',
 			  capture: g_webshark_file
 		  };
   
@@ -291,7 +291,7 @@
   {
 	  webshark_json_get(
 		  {
-			  req: 'frame',
+			  method: 'frame',
 			  capture: g_webshark_file,
 			  frame: framenum
 		  },
@@ -302,7 +302,7 @@
   {
 	  var set_req =
 		  {
-			  req: 'setcomment',
+			  method: 'setcomment',
 			  capture: g_webshark_file,
 			  frame: framenum
 		  };
@@ -625,7 +625,7 @@
   
 	  var load_req =
 		  {
-			  req: 'frame',
+			  method: 'frame',
 			  bytes: 'yes',
 			  proto: 'yes',
 			  capture: g_webshark_file,
@@ -720,7 +720,7 @@
   {
 	  webshark_json_get(
 		  {
-			  req: 'follow',
+			  method: 'follow',
 			  capture: g_webshark_file,
 			  follow: follow,
 			  filter: filter
@@ -887,7 +887,7 @@
   
 	  window.webshark.webshark_json_get(
 		  {
-			  req: 'complete',
+			  method: 'complete',
 			  field: field
 		  },
 		  function(data)
@@ -995,7 +995,7 @@
   
 	  var check_req =
 		  {
-			  req: 'check'
+			  method: 'check'
 		  };
   
 	  if (this.mode == 'field')
@@ -1011,7 +1011,7 @@
 			  if (that.mode == 'field')
 				  txt = data['field'];
   
-			  if (txt == 'ok')
+			  if ("status" in data && data["status"] == "OK")
 				  el.className = 'ws_gui_text_valid';
 			  else if (txt == 'deprecated')
 				  el.className = 'ws_gui_text_deprecated';
@@ -1381,7 +1381,7 @@
   
 	  var files_req =
 		  {
-			  req: 'files'
+			  method: 'files'
 		  };
   
 	  if (dir)
@@ -2511,7 +2511,7 @@
   {
 	  var graph_req =
 		  {
-			  req: 'iograph',
+			  method: 'iograph',
 			  capture: g_webshark_file
 		  };
   
@@ -2732,7 +2732,7 @@
   
 	  var dumpconf_req =
 		  {
-			  req: 'dumpconf'
+			  method: 'dumpconf'
 		  };
   
 	  if (this.capture_filename)
@@ -2846,7 +2846,7 @@
   
 	  var tap_req =
 		  {
-			  req: 'tap',
+			  method: 'tap',
 			  capture: g_webshark_file,
 			  tap0: anal
 		  };
@@ -3228,7 +3228,7 @@
 		  down_a.setAttribute("target", "_blank");
 		  down_a.setAttribute("href", window.webshark.webshark_create_api_url(
 			  {
-				  req: 'download',
+				  method: 'download',
 				  capture: g_webshark_file,
 				  token: data['_download']
 			  }));
@@ -3255,7 +3255,7 @@
 		  down_a["ws_rtp"] = data['_play'];
 		  down_a.setAttribute("href", window.webshark.webshark_create_api_url(
 			  {
-				  req: 'download',
+				  method: 'download',
 				  capture: g_webshark_file,
 				  token: data['_play']
 			  }));
@@ -4011,7 +4011,7 @@
   {
 	  var tap_req =
 		  {
-			  req: 'tap',
+			  method: 'tap',
 			  capture: g_webshark_file
 		  };
   

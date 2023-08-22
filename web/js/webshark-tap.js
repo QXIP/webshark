@@ -53,7 +53,7 @@ function webshark_tap_row_on_click_analyse(node, anal)
 
 	var tap_req =
 		{
-			req: 'tap',
+			method: 'tap',
 			capture: g_webshark_file,
 			tap0: anal
 		};
@@ -435,7 +435,7 @@ function webshark_create_tap_action_common(data)
 		down_a.setAttribute("target", "_blank");
 		down_a.setAttribute("href", window.webshark.webshark_create_api_url(
 			{
-				req: 'download',
+				method: 'download',
 				capture: g_webshark_file,
 				token: data['_download']
 			}));
@@ -462,7 +462,7 @@ function webshark_create_tap_action_common(data)
 		down_a["ws_rtp"] = data['_play'];
 		down_a.setAttribute("href", window.webshark.webshark_create_api_url(
 			{
-				req: 'download',
+				method: 'download',
 				capture: g_webshark_file,
 				token: data['_play']
 			}));
@@ -1218,7 +1218,7 @@ function webshark_load_tap(taps)
 {
 	var tap_req =
 		{
-			req: 'tap',
+			method: 'tap',
 			capture: g_webshark_file
 		};
 

@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs');
-const fetch = require("node-fetch");
+const fetch = import("node-fetch");
 const sharkd_dict = require('../custom_module/sharkd_dict');
 const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
 
@@ -17,15 +17,15 @@ const download = function(url, dest, cb) {
 
 module.exports = function (fastify, opts, next) {
 
-  fastify.register(require('fastify-static'), {
+  fastify.register(require('@fastify/static'), {
     root: CAPTURES_PATH,
     prefix: '/webshark//', // defeat unique prefix
   })
 
   fastify.get('/webshark/json', function (request, reply) {
 
-    if (request.query && "req" in request.query) {
-      if (request.query.req === 'files') {
+    if (request.query && "method" in request.query) {
+      if (request.query.method === 'files') {
         let files = fs.readdirSync(CAPTURES_PATH);
         let results = {"files":[], "pwd": "."};
         let loaded_files = sharkd_dict.get_loaded_sockets();
@@ -53,7 +53,7 @@ module.exports = function (fastify, opts, next) {
           }
         });
         reply.send(JSON.stringify(results));
-      } else if (request.query.req === 'download') {
+      } else if (request.query.method === 'download') {
         if ("capture" in request.query) {
           if (request.query.capture.includes('..')) {
             reply.send(JSON.stringify({"err": 1, "errstr": "Nope"}));
@@ -87,7 +87,7 @@ module.exports = function (fastify, opts, next) {
           }
         }
       } else if (
-        request.query.req === 'tap' &&
+        request.query.method === 'tap' &&
         'tap0' in request.query && 
         ['srt:dcerpc', 'srt:rpc', 'srt:scsi', 'rtd:megaco'].includes(request.query.tap0) // catch the four invalid requests and prevent socket failure
       ) {

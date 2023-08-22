@@ -3,7 +3,21 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 const SHARKD_SOCKET = process.env.SHARKD_SOCKET || "/var/run/sharkd.sock";
-const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
+
+// Make sure CAPTURES_PATH has a trailing /
+let _captures_path = process.env.CAPTURES_PATH || "/captures/";
+if (_captures_path.at(-1) !== "/") {
+  _captures_path += "/";
+}
+const CAPTURES_PATH = _captures_path;
+delete _captures_path
+
+// newer versions of sharkd are picky about JSON types
+// from sharkd_session.c: struct member_attribute name_array[]
+const SHARKD_INTEGER_PARAMS = new Set(["frame", "ref_frame", "prev_frame", "skip", "limit", "interval"]);
+const SHARKD_BOOLEAN_PARAMS = new Set(["proto", "columns", "color", "bytes", "hidden"]);
+const SHARKD_TRUE_VALUES = new Set(["yes", "true", "1"]);
+
 var sharkd_objects = {};
 var AsyncLock = require('async-lock');
 var lock = new AsyncLock({timeout: 300000}); // 5 minutes timeout for the lock
@@ -65,11 +79,11 @@ get_sharkd_cli = async function(capture) {
         sharkd_proc = spawn('sharkd', ['unix:' + SHARKD_SOCKET]);
         await sleep(250);
         if (sharkd_proc.exitCode === 1) {
-          console.log(`Error spawning sharkd under ${SHARKD_SOCKET}`);
+          console.log(`Error spawning sharkd under ${SHARKD_SOCKET} / exit 1`);
           process.exit(1);
         }
       } catch (err_2) {
-        console.log(`Error spawning sharkd under ${SHARKD_SOCKET}`);
+        console.log(`Error spawning sharkd under ${SHARKD_SOCKET} / err_2`);
         console.log(err_2);
         process.exit(1);
       }
@@ -78,7 +92,7 @@ get_sharkd_cli = async function(capture) {
     sharkd_objects[socket_name] = new_socket;
     
     if(capture !== '') {
-      await send_req({'req':'load', 'file': capture}, sharkd_objects[socket_name]);
+      await send_req({'method':'load', 'file': capture}, sharkd_objects[socket_name]);
       return sharkd_objects[socket_name];
     } else {
       return sharkd_objects[socket_name];
@@ -107,8 +121,29 @@ function _str_is_json(str) {
  * @param {PromiseSocket|null} sock optional socket to use for communication
  * @returns {string} data returned from sharkd as string
  */
+let jsonrpc_id=0;
 send_req = async function(request, sock) {
   let cap_file = '';
+
+  // newer versions of sharkd require jsonrpc, add required fields to request
+  // FIXME: should use a jsonrpc library for this
+  request["jsonrpc"] = "2.0";
+  request["id"] = ++jsonrpc_id;
+
+  // FIXME: should update the frontend/backend to use a POST with json
+  // the current approach of GET params makes every value a string
+  for (var key of Object.keys(request)) {
+    if (SHARKD_INTEGER_PARAMS.has(key)) {
+      if(typeof request[key] === "string" || request[key] instanceof String) {
+        request[key] = parseInt(request[key]);
+      }
+    }
+    if (SHARKD_BOOLEAN_PARAMS.has(key)) {
+      if(typeof request[key] === "string" || request[key] instanceof String) {
+        request[key] = SHARKD_TRUE_VALUES.has(request[key]);
+      }
+    }
+  }
   
   if ("capture" in request) {
     if (request.capture.includes('..')) {
@@ -117,11 +152,15 @@ send_req = async function(request, sock) {
 
     let req_capture = request.capture;
 
+    // newer versions of sharkd don't allow extraneous fields
+    // capture is used by webshark to track connection handles
+    delete request.capture;
+
     if (req_capture.startsWith("/")) {
       req_capture = req_capture.substr(1);
     }
 
-    cap_file = `${CAPTURES_PATH}${request.capture}`;
+    cap_file = `${CAPTURES_PATH}${req_capture}`;
 
     // verify that pcap exists
     if (fs.existsSync(cap_file) === false) {
@@ -155,7 +194,16 @@ send_req = async function(request, sock) {
       data += chunk;
     }
     
-    return data;
+    // newer versions of webshark wrap return data in a "result" field
+    // try to simulate the old behavior to avoid rewriting a bunch of js
+    // FIXME: should probably rewrite dependent code and remove this
+    result = JSON.parse(data);
+
+    if ("result" in result) {
+      result = result["result"];
+    }
+
+    return JSON.stringify(result);
   }
 
   return await lock.acquire(cap_file, _send_req_internal);

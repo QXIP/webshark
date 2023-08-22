@@ -251,7 +251,7 @@ WSIOGraph.prototype.update = function()
 {
 	var graph_req =
 		{
-			req: 'iograph',
+			method: 'iograph',
 			capture: g_webshark_file
 		};
 

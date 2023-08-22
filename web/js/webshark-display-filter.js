@@ -83,7 +83,7 @@ function complete_field_cache(field, fun)
 
 	window.webshark.webshark_json_get(
 		{
-			req: 'complete',
+			method: 'complete',
 			field: field
 		},
 		function(data)
@@ -191,7 +191,7 @@ WSDisplayFilter.prototype.checkfilter = function()
 
 	var check_req =
 		{
-			req: 'check'
+			method: 'check'
 		};
 
 	if (this.mode == 'field')
@@ -207,7 +207,7 @@ WSDisplayFilter.prototype.checkfilter = function()
 			if (that.mode == 'field')
 				txt = data['field'];
 
-			if (txt == 'ok')
+			if ("status" in data && data["status"] == "OK")
 				el.className = 'ws_gui_text_valid';
 			else if (txt == 'deprecated')
 				el.className = 'ws_gui_text_deprecated';

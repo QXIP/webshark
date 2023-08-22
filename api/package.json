@@ -17,17 +17,20 @@
   "author": "joviniko@gmail.com",
   "license": "GPLv2",
   "dependencies": {
+    "@fastify/autoload": "^5.7.1",
+    "@fastify/static": "^6.10.2",
     "async-lock": "^1.2.0",
-    "fastify": "^2.0.0",
-    "fastify-autoload": "^0.6.0",
-    "fastify-cli": "^1.0.0",
-    "fastify-file-upload": "^1.0.0",
-    "fastify-plugin": "^1.5.0",
-    "fastify-static": "^2.4.0",
-    "promise-socket": "^4.0.1",
-    "node-fetch": "^3.2.6"
+    "fastify": "^4.21.0",
+    "fastify-cli": "^5.8.0",
+    "fastify-file-upload": "^4.0.0",
+    "fastify-plugin": "^4.5.1",
+    "fastify-static": "^4.7.0",
+    "glob-parent": "^6.0.2",
+    "node-fetch": "^3.2.6",
+    "promise-socket": "^7.0.0",
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "tap": "^12.5.3"
+    "tap": "^16.3.8"
   }
 }

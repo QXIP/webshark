@@ -267,7 +267,7 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 					down_a.setAttribute("target", "_blank");
 					down_a.setAttribute("href", window.webshark.webshark_create_api_url(
 						{
-							req: 'download',
+							method: 'download',
 							capture: g_webshark_file,
 							token: 'self'
 						}));
@@ -479,7 +479,7 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 
 			window.webshark.webshark_json_get(
 				{
-					req: 'info'
+					method: 'info'
 				},
 				function(data)
 				{
@@ -616,7 +616,6 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 			</li>
 		</ul>
 		</div>
-		<!--
 		<div style="float: right; border: 1px solid grey;">
 			<div id="capture_interval" style="margin-top: 2px;">
 				<svg width="620" height="100"></svg>
@@ -632,7 +631,6 @@ TODO: Give user possible to generate multiple reports by selecting checkboxes
 				<button id="capture_interval_adv" class="wsbutton" style="margin-left: 15px;" onclick="show_hide_graph('report_graph', 'capture_interval_adv')">Advanced Graph</button>
 			</div>
 		</div>
-		-->
 		<div style="clear: both;"></div>
 
 		<div id="report_graph" style="border: 2px solid grey; display: none;">

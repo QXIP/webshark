@@ -160,7 +160,7 @@ WSPreferencesTable.prototype.loadPrefs = function()
 
 	var dumpconf_req =
 		{
-			req: 'dumpconf'
+			method: 'dumpconf'
 		};
 
 	if (this.capture_filename)
