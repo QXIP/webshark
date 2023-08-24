@@ -46,7 +46,7 @@ Webshark.prototype.load = function(filename, cb)
 {
 	var req_status =
 		{
-			req: 'status',
+			method: 'status',
 			capture: filename
 		};
 
@@ -158,7 +158,7 @@ Webshark.prototype.update = function()
 {
 	var req_intervals =
 		{
-			req: 'intervals',
+			method: 'intervals',
 			capture: g_webshark_file
 		};
 
@@ -195,7 +195,7 @@ Webshark.prototype.fetchColumns = function(skip, load_first)
 {
 	var req_frames =
 		{
-			req: 'frames',
+			method: 'frames',
 			capture: g_webshark_file
 		};
 
@@ -276,7 +276,7 @@ Webshark.prototype.getComment = function(framenum, func)
 {
 	webshark_json_get(
 		{
-			req: 'frame',
+			method: 'frame',
 			capture: g_webshark_file,
 			frame: framenum
 		},
@@ -287,7 +287,7 @@ Webshark.prototype.setComment = function(framenum, new_comment)
 {
 	var set_req =
 		{
-			req: 'setcomment',
+			method: 'setcomment',
 			capture: g_webshark_file,
 			frame: framenum
 		};
@@ -615,7 +615,7 @@ function webshark_load_frame(framenum, scroll_to, cols)
 
 	var load_req =
 		{
-			req: 'frame',
+			method: 'frame',
 			bytes: 'yes',
 			proto: 'yes',
 			capture: g_webshark_file,
@@ -710,7 +710,7 @@ function webshark_load_follow(follow, filter)
 {
 	webshark_json_get(
 		{
-			req: 'follow',
+			method: 'follow',
 			capture: g_webshark_file,
 			follow: follow,
 			filter: filter

@@ -3,11 +3,15 @@ version: '2'
 services:
 
   webshark:
-    image: qxip/webshark
+    #image: qxip/webshark
+    build: .
     container_name: webshark
     expose:
       - "8085"
     ports:
-      - "8085:8085"
+      - "8086:8085"
     volumes:
       - ./captures:/captures
+    environment:
+      - SHARKD_SOCKET=/home/node/sharkd.sock
+      - CAPTURES_PATH=/captures/

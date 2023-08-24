@@ -349,7 +349,7 @@ WSCaptureFilesTable.prototype.loadFiles = function(dir)
 
 	var files_req =
 		{
-			req: 'files'
+			method: 'files'
 		};
 
 	if (dir)
