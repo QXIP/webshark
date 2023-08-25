@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tap test/**/*.test.js",
-    "start": "npx fastify start -l info app.js -p 8085",
+    "start": "npx fastify start -l info app.js -a 0.0.0.0 -p 8085",
     "dev": "fastify start -l info -P app.js -a 0.0.0.0 -p 8085"
   },
   "keywords": [
