@@ -625,7 +625,8 @@ function webshark_load_frame(framenum, scroll_to, cols)
 	var ref_framenum = g_webshark.getRefFrame(framenum);
 	if (ref_framenum)
 		load_req['ref_frame'] = ref_framenum;
-	load_req['prev_frame'] = framenum - 1;   /* TODO */
+	if (framenum > 1)
+		load_req['prev_frame'] = framenum - 1;   /* TODO */
 
 	webshark_json_get(load_req,
 		function(data)
@@ -651,7 +652,7 @@ function webshark_load_frame(framenum, scroll_to, cols)
 
 			if (fol)
 			{
-				for (var i = 1; i < fol.length; i++)
+				for (var i = 0; i < fol.length; i++)
 				{
 					var it = document.getElementById('menu_tap_follow:' + fol[i][0]);
 
