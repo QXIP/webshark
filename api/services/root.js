@@ -22,6 +22,10 @@ module.exports = function (fastify, opts, next) {
     prefix: '/webshark//', // defeat unique prefix
   })
 
+  fastify.get('/', async (req, res) => {
+    res.redirect('/webshark');
+  });
+
   fastify.get('/webshark/json', function (request, reply) {
 
     if (request.query && "method" in request.query) {
@@ -31,8 +35,8 @@ module.exports = function (fastify, opts, next) {
         let loaded_files = sharkd_dict.get_loaded_sockets();
         files.forEach( async function(pcap_file){
           if (pcap_file.endsWith('.pcap')) {
-
-	    if(pcap_file.startsWith('http:')){
+            /* fetch URLs to local folder */
+	    if(pcap_file.startsWith('http')){
 		  const res = await fetch(pcap_file);
                   var filename = pcap_file.split('/').pop()
 		  const fileStream = fs.createWriteStream(CAPTURES_PATH+filename);
