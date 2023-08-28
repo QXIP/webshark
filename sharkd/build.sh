@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+set -ex
 
 ## GeoIP
 # apt-get update && apt-get install -y libmaxminddb-dev
@@ -10,9 +10,9 @@ git pull
 #git reset --hard 640ded8e1d45ec3ee8594c385b1045cbaa0042a0   ## tested with this hash
 
 # Integrate sharkd
-patch -p1 < ../sharkd/sharkd.patch
-patch -p1 < ../sharkd/sharkd_opt_memory.patch ## optional
-cp ../sharkd/*.[ch] ./
+#patch -p1 < ../sharkd/sharkd.patch
+#patch -p1 < ../sharkd/sharkd_opt_memory.patch ## optional
+#cp ../sharkd/*.[ch] ./
 
 mkdir build
 cd build
