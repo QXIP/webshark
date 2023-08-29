@@ -32,6 +32,7 @@ COPY --from=intermediate /out /out
 RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
 
 ENV CAPTURES_PATH=/captures/
+ENV SHARKD_SOCKET=/home/node/sharkd.sock
 
 # RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
 COPY --chown=node . /usr/src/node-webshark
