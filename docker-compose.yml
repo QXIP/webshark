@@ -3,8 +3,8 @@ version: '2'
 services:
 
   webshark:
-    #image: ghcr.io/qxip/webshark:2.0.0
-    build: .
+    image: ghcr.io/qxip/webshark:2.0.0
+    # build: .
     container_name: webshark
     expose:
       - "8085"
