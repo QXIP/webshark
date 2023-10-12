@@ -8,8 +8,6 @@ This projects implements the original webShark API in NodeJS, improving its capa
 
 ![image](https://github.com/RFbkak37y3kIY/webshark/assets/1423657/491054ae-a2e7-4570-8133-a88eb3bd49d5)
 
-
-
 ## Instructions
 Mount your PCAP content directory to location `/captures` and launch webshark
 

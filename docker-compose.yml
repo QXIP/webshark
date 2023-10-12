@@ -3,7 +3,7 @@ version: '2'
 services:
 
   webshark:
-    # image: ghcr.io/qxip/webshark:2.1.0
+    # image: ghcr.io/qxip/webshark:latest
     build: .
     container_name: webshark
     expose:
