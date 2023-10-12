@@ -1,4 +1,4 @@
-<img src=https://user-images.githubusercontent.com/1423657/58752485-dd646c00-84af-11e9-94e9-c18529103638.png width=220>
+<img src=https://github.com/RFbkak37y3kIY/webshark/assets/1423657/e769fcbf-d83b-4d07-8e86-c9b5706ad5ee width=250>
 
 # node-webshark
 
@@ -6,7 +6,8 @@
 
 This projects implements the original webShark API in NodeJS, improving its capabilities and input methods to support PCAP storage backends APIs such as Stenographer and others.
 
-![image](https://user-images.githubusercontent.com/1423657/100542883-351e9780-324d-11eb-8f10-28eb758245ea.png)
+![image](https://github.com/RFbkak37y3kIY/webshark/assets/1423657/491054ae-a2e7-4570-8133-a88eb3bd49d5)
+
 
 
 ## Instructions
