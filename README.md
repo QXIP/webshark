@@ -1,6 +1,6 @@
 <img src=https://github.com/RFbkak37y3kIY/webshark/assets/1423657/e769fcbf-d83b-4d07-8e86-c9b5706ad5ee width=250>
 
-# node-webshark
+# webshark-ng
 
 **webShark** is a *Wireshark-like* web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) and featuring all its dissectors.
 
