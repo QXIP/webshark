@@ -33,11 +33,7 @@ RUN cd / && tar zxvf /out/sharkd.tar.gz && rm -rf /out/sharkd.tar.gz
 
 ENV CAPTURES_PATH=/captures/
 
-# RUN git clone --single-branch --branch master https://github.com/qxip/node-webshark /usr/src/node-webshark
 COPY --chown=node . /usr/src/node-webshark
-
-WORKDIR /usr/src/node-webshark
-RUN npm i -g browserify-lite && browserify-lite --standalone webshark ./web/js/webshark.js --outfile web/js/webshark-app.js
 
 USER node
 
