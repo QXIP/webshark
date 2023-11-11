@@ -24,7 +24,6 @@
     "fastify-cli": "^5.8.0",
     "fastify-file-upload": "^4.0.0",
     "fastify-plugin": "^4.5.1",
-    "fastify-static": "^4.7.0",
     "glob-parent": "^6.0.2",
     "node-fetch": "^3.2.6",
     "promise-socket": "^7.0.0",
