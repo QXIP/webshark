@@ -38,7 +38,8 @@ COPY --chown=node . /usr/src/node-webshark
 USER node
 
 WORKDIR /usr/src/node-webshark/api
-RUN npm install && npm audit fix
+RUN npm install
+RUN npm audit fix
 
 EXPOSE 8085
 ENTRYPOINT [ "/usr/src/node-webshark/entrypoint.sh" ]
