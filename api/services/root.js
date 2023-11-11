@@ -3,6 +3,7 @@ const fs = require('fs');
 const fetch = import("node-fetch");
 const sharkd_dict = require('../custom_module/sharkd_dict');
 const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
+const url_re = /^https?:\/\//
 
 const download = function(url, dest, cb) {
   var file = fs.createWriteStream(dest);
@@ -36,7 +37,7 @@ module.exports = function (fastify, opts, next) {
         files.forEach( async function(pcap_file){
           if (pcap_file.endsWith('.pcap')) {
             /* fetch URLs to local folder */
-	    if(pcap_file.startsWith('http')){
+	    if(pcap_file.match(url_re)) {
 		  const res = await fetch(pcap_file);
                   var filename = pcap_file.split('/').pop()
 		  const fileStream = fs.createWriteStream(CAPTURES_PATH+filename);
