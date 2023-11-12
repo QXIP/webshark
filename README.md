@@ -2,11 +2,12 @@
 
 # webshark-ng
 
-**webShark** is a *Wireshark-like* web user interface powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) and featuring all its dissectors.
+**webShark** is a *Wireshark-like* webapp powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) and all its dissectors 🕵️
 
-This projects implements the original webShark API in NodeJS, improving its capabilities and input methods to support PCAP storage backends APIs such as Stenographer, N2Disk and others.
+![ezgif com-optimize (11)](https://github.com/QXIP/webshark/assets/1423657/092c2544-f5db-4a79-b3da-d48df4e0813c)
+> Client-Side RTP playback powered by WASM/ffmpeg 🚀
 
-![image](https://github.com/RFbkak37y3kIY/webshark/assets/1423657/491054ae-a2e7-4570-8133-a88eb3bd49d5)
+<br>
 
 ## Instructions
 Mount your PCAP content directory to location `/captures` and launch webshark
