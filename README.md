@@ -4,7 +4,8 @@
 
 **webShark** is a *Wireshark-like* webapp powered by [sharkd](https://wiki.wireshark.org/Development/sharkd) and all its dissectors 🕵️
 
-![ezgif com-optimize (11)](https://github.com/QXIP/webshark/assets/1423657/092c2544-f5db-4a79-b3da-d48df4e0813c)
+<img src="https://github.com/QXIP/webshark/assets/1423657/092c2544-f5db-4a79-b3da-d48df4e0813c" width=600 />
+
 > Client-Side RTP playback powered by WASM/ffmpeg 🚀
 
 <br>
