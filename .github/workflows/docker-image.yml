@@ -19,16 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Checkout UI repository
-        uses: actions/checkout@v3
-        with:
-          repository: qxip/webshark-ui
-          path: webshark-ui
-
       - name: Overwrite UI
         run: |
-          rm -rf web/*
-          cp -r webshark-ui/dist/webshark/* web/*
+          ls -alF
+          rm -rf ./web/*
+          curl -fsSL github.com/qxip/webshark-ui/releases/latest/download/latest.zip -O
+          unzip latest.zip -d ./web
           
       - name: Log in to the Container registry
         uses: docker/login-action@v2.0.0
