@@ -28,7 +28,8 @@ RUN apt update \
     && apt install -y git libglib2.0-0 speex libspeex1 libspeexdsp1 libc-ares2 libxml2 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /captures /usr/local/bin /usr/local/share/wireshark/
+RUN mkdir -p /captures /usr/local/bin /usr/local/share/wireshark/ \
+    && chown -R node: /captures
 
 COPY --from=intermediate /usr/src/wireshark/build/run/sharkd /usr/local/bin/sharkd
 COPY --from=intermediate /usr/src/wireshark/build/run/colorfilters /usr/local/share/wireshark/colorfilters
@@ -39,7 +40,6 @@ ENV SHARKD_SOCKET=/captures/sharkd.sock
 COPY --chown=node . /usr/src/node-webshark
 COPY --from=intermediate /usr/src/web /usr/src/node-webshark/web
 
-USER node
 VOLUME /captures
 
 WORKDIR /usr/src/node-webshark/api
