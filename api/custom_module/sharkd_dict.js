@@ -186,15 +186,6 @@ send_req = async function(request, sock) {
       return null;
     }
 
-    let data = '';
-    let chunk = await new_sock.read();
-
-    data += chunk;
-    while (_str_is_json(data) === false) {
-      chunk = await new_sock.read();
-      data += chunk;
-    }
-
     let result = await readAndParseSocket(new_sock);
 
     if ("result" in result) {
