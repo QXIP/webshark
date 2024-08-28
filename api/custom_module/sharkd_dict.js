@@ -1,5 +1,6 @@
 const {PromiseSocket} = require('promise-socket');
 const { spawn } = require('child_process');
+const JSONStream = require('JSONStream');
 const fs = require('fs');
 
 const SHARKD_SOCKET = process.env.SHARKD_SOCKET || "/var/run/sharkd.sock";
@@ -90,7 +91,7 @@ get_sharkd_cli = async function(capture) {
       return get_sharkd_cli(capture);
     }
     sharkd_objects[socket_name] = new_socket;
-    
+
     if(capture !== '') {
       await send_req({'method':'load', 'file': capture}, sharkd_objects[socket_name]);
       return sharkd_objects[socket_name];
@@ -144,7 +145,7 @@ send_req = async function(request, sock) {
       }
     }
   }
-  
+
   if ("capture" in request) {
     if (request.capture.includes('..')) {
       return JSON.stringify({"err": 1, "errstr": "Nope"});
@@ -164,16 +165,16 @@ send_req = async function(request, sock) {
 
     // verify that pcap exists
     if (fs.existsSync(cap_file) === false) {
-        return JSON.stringify({"err": 1, "errstr": "Nope"});
+      return JSON.stringify({"err": 1, "errstr": "Nope"});
     }
   }
-  
+
   async function _send_req_internal() {
     let new_sock = sock;
     if (typeof(new_sock) === 'undefined') {
       new_sock = await get_sharkd_cli(cap_file);
     }
-  
+
     if (new_sock === null) {
       return JSON.stringify({"err": 1, "errstr": `cannot connect to sharkd using socket: ${SHARKD_SOCKET}`});
     }
@@ -193,11 +194,8 @@ send_req = async function(request, sock) {
       chunk = await new_sock.read();
       data += chunk;
     }
-    
-    // newer versions of webshark wrap return data in a "result" field
-    // try to simulate the old behavior to avoid rewriting a bunch of js
-    // FIXME: should probably rewrite dependent code and remove this
-    result = JSON.parse(data);
+
+    let result = await readAndParseSocket(new_sock);
 
     if ("result" in result) {
       result = result["result"];
@@ -207,6 +205,39 @@ send_req = async function(request, sock) {
   }
 
   return await lock.acquire(cap_file, _send_req_internal);
+}
+
+/**
+ * Reads data from the socket stream and parses it into a JSON object.
+ * The parser will end when the stream ends, and the parsed data will be returned.
+ *
+ * @param {Object} socket - The socket object containing the data stream, must have a `stream` property.
+ * @returns {Promise<Object>} A Promise that resolves to the parsed JSON data.
+ */
+async function readAndParseSocket(socket) {
+  return new Promise((resolve, reject) => {
+    const stream = socket.stream;
+    const parser = JSONStream.parse();
+
+    let data = '';
+
+    stream.on('data', (chunk) => {
+      data += chunk;
+      parser.write(chunk);
+    });
+
+    parser.on('data', (parsedData) => {
+      resolve(parsedData);
+    });
+
+    parser.on('error', (err) => {
+      reject(err);
+    });
+
+    stream.on('end', () => {
+      parser.end();
+    });
+  });
 }
 
 exports.get_sharkd_cli = get_sharkd_cli;
