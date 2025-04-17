@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /out /usr/src /var/run
 WORKDIR /usr/src
 
-RUN git clone --depth=1 https://github.com/qxip/node-webshark.git /usr/src/node-webshark
-RUN git clone --depth=1 https://gitlab.com/wireshark/wireshark.git /usr/src/wireshark
+RUN git clone --depth 1 --branch 2.1.8 https://github.com/qxip/node-webshark.git /usr/src/node-webshark
+RUN git clone --depth 1 --branch v4.4.6 https://gitlab.com/wireshark/wireshark.git /usr/src/wireshark
 
 WORKDIR /usr/src/wireshark
 RUN ../node-webshark/sharkd/build.sh
@@ -37,7 +37,7 @@ COPY --from=intermediate /usr/src/wireshark/build/run/colorfilters /usr/local/sh
 ENV CAPTURES_PATH=/captures/
 ENV SHARKD_SOCKET=/captures/sharkd.sock
 
-COPY --chown=node . /usr/src/node-webshark
+COPY --from=intermediate --chown=node /usr/src/node-webshark /usr/src/node-webshark
 COPY --from=intermediate /usr/src/web /usr/src/node-webshark/web
 
 VOLUME /captures
