@@ -18,9 +18,9 @@
   "license": "GPLv2",
   "dependencies": {
     "@fastify/autoload": "^5.7.1",
-    "@fastify/static": "^6.10.2",
+    "@fastify/static": "^10.1.2",
     "async-lock": "^1.2.0",
-    "fastify": "^4.21.0",
+    "fastify": "^5.10.0",
     "fastify-cli": "^5.8.0",
     "fastify-file-upload": "^4.0.0",
     "fastify-plugin": "^4.5.1",
