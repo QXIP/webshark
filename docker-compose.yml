@@ -13,7 +13,8 @@ services:
     volumes:
       - ./captures:/captures
     environment:
-      - SHARKD_SOCKET=/home/node/sharkd.sock
+      # Keep socket under CAPTURES_PATH (writable, exclusive to this volume).
+      - SHARKD_SOCKET=/captures/sharkd.sock
       - CAPTURES_PATH=/captures/
       # Optional Stenographer bridge (#42):
       # - STENOGRAPHER_URL=https://steno.example.com:1234
