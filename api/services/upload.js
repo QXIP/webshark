@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const { pipeline } = require('stream/promises')
 const multipart = require('@fastify/multipart')
+const rateLimit = require('@fastify/rate-limit')
 
 const MAX_FILE_SIZE = Number(process.env.UPLOAD_MAX_BYTES) || Infinity
 
@@ -30,15 +31,25 @@ async function writeUploadStream (destPath, inputStream) {
   }
 }
 
-module.exports = function (fastify, opts, next) {
-  fastify.register(multipart, {
+module.exports = async function (fastify) {
+  const max = Number(process.env.UPLOAD_RATE_MAX) || 30
+  const timeWindow = Number(process.env.UPLOAD_RATE_TIME_WINDOW_MS) || 60 * 1000
+  const rateLimitConfig = { max, timeWindow }
+
+  await fastify.register(rateLimit, {
+    global: false,
+    max,
+    timeWindow
+  })
+
+  await fastify.register(multipart, {
     limits: {
       fileSize: MAX_FILE_SIZE,
       files: 20
     }
   })
 
-  fastify.post('/webshark/upload', async function (req, reply) {
+  fastify.post('/webshark/upload', { config: { rateLimit: rateLimitConfig } }, async function (req, reply) {
     const fileArr = []
 
     // Prefer streaming multipart parts (avoids Buffer/fs.write INT32 limit on huge PCAPs).
@@ -117,6 +128,4 @@ module.exports = function (fastify, opts, next) {
     }
     return fileArr.length === 1 ? fileArr[0] : fileArr
   })
-
-  next()
 }

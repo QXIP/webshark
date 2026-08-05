@@ -1,13 +1,25 @@
 'use strict'
 const fs = require('fs')
 const path = require('path')
+const rateLimit = require('@fastify/rate-limit')
 const sharkd_dict = require('../custom_module/sharkd_dict')
+
 function capturesPath () {
   const p = process.env.CAPTURES_PATH || '/captures/'
   return p.endsWith(path.sep) ? p : p + path.sep
 }
 
-module.exports = function (fastify, opts, next) {
+module.exports = async function (fastify) {
+  const max = Number(process.env.API_RATE_MAX) || 120
+  const timeWindow = Number(process.env.API_RATE_TIME_WINDOW_MS) || 60 * 1000
+  const rateLimitConfig = { max, timeWindow }
+
+  await fastify.register(rateLimit, {
+    global: false,
+    max,
+    timeWindow
+  })
+
   fastify.register(require('@fastify/static'), {
     root: capturesPath(),
     prefix: '/webshark//', // defeat unique prefix
@@ -17,7 +29,7 @@ module.exports = function (fastify, opts, next) {
     res.redirect('/webshark')
   })
 
-  fastify.get('/webshark/json', function (request, reply) {
+  fastify.get('/webshark/json', { config: { rateLimit: rateLimitConfig } }, function (request, reply) {
     if (!(request.query && 'method' in request.query)) {
       return
     }
@@ -118,6 +130,4 @@ module.exports = function (fastify, opts, next) {
       reply.send(data)
     })
   })
-
-  next()
 }
