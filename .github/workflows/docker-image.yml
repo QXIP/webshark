@@ -3,6 +3,16 @@ name: Docker Build & Release
 on:
   release:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      ui_mode:
+        description: 'UI mode (full shows file list; kiosk hides it)'
+        required: false
+        default: full
+        type: choice
+        options:
+          - full
+          - kiosk
 
 env:
   REGISTRY: ghcr.io
@@ -17,27 +27,32 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Overwrite UI
-        run: |
-          ls -alF
-          rm -rf ./web/*
-          curl -fsSL github.com/qxip/webshark-ui/releases/latest/download/latest.zip -O
-          unzip latest.zip -d ./web
-          
       - name: Log in to the Container registry
-        uses: docker/login-action@v2.0.0
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
+      - name: Set UI mode
+        id: ui
+        run: |
+          MODE="${{ github.event.inputs.ui_mode }}"
+          if [ -z "$MODE" ]; then MODE=full; fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+
       - name: Build and push
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
+          build-args: |
+            WEBSHARK_UI_MODE=${{ steps.ui.outputs.mode }}
+            WIRESHARK_REF=v4.4.6
+            SHARKD_BUILD_JOBS=4
           tags: |
              ghcr.io/qxip/webshark:latest
-             ghcr.io/qxip/webshark:${{ github.event.release.tag_name }}
+             ghcr.io/qxip/webshark:${{ github.event.release.tag_name || github.sha }}
+             ghcr.io/qxip/webshark:ui-${{ steps.ui.outputs.mode }}

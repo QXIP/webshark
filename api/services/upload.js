@@ -1,33 +1,121 @@
 'use strict'
 
-const fs = require('fs');
-const fileUpload = require('fastify-file-upload');
-const CAPTURES_PATH = process.env.CAPTURES_PATH || "/captures/";
+const fs = require('fs')
+const path = require('path')
+const { pipeline } = require('stream/promises')
+const multipart = require('@fastify/multipart')
+
+const MAX_FILE_SIZE = Number(process.env.UPLOAD_MAX_BYTES) || Infinity
+
+function capturesPath () {
+  const p = process.env.CAPTURES_PATH || '/captures/'
+  return p.endsWith(path.sep) ? p : p + path.sep
+}
+
+function safeCaptureName (name) {
+  const base = path.basename(String(name || '')).replace(/[\0]/g, '')
+  if (!base || base === '.' || base === '..') {
+    throw new Error('invalid filename')
+  }
+  return base
+}
+
+async function writeUploadStream (destPath, inputStream) {
+  const out = fs.createWriteStream(destPath)
+  try {
+    await pipeline(inputStream, out)
+  } catch (err) {
+    try { fs.unlinkSync(destPath) } catch (_) {}
+    throw err
+  }
+}
 
 module.exports = function (fastify, opts, next) {
-  fastify.register(fileUpload);
-  fastify.post('/webshark/upload', function (req, reply) {
-    const files = req.raw.files
-    let fileArr = []
-    for(let key in files){
-        if(!files[key].name||!files[key].data) return;
-        fs.writeFile(CAPTURES_PATH+files[key].name, files[key].data, function(err) {
-          if(err) {
-            return console.log(err);
-          }
-        });
+  fastify.register(multipart, {
+    limits: {
+      fileSize: MAX_FILE_SIZE,
+      files: 20
+    }
+  })
+
+  fastify.post('/webshark/upload', async function (req, reply) {
+    const fileArr = []
+
+    // Prefer streaming multipart parts (avoids Buffer/fs.write INT32 limit on huge PCAPs).
+    if (typeof req.parts === 'function') {
+      const parts = req.parts()
+      for await (const part of parts) {
+        if (part.type !== 'file') {
+          continue
+        }
+        let filename
+        try {
+          filename = safeCaptureName(part.filename)
+        } catch (err) {
+          reply.code(400)
+          return { err: 1, errstr: err.message }
+        }
+
+        const destPath = path.join(capturesPath(), filename)
+        try {
+          await writeUploadStream(destPath, part.file)
+        } catch (err) {
+          req.log.error({ err, filename }, 'upload failed')
+          reply.code(500)
+          return { err: 1, errstr: 'upload failed' }
+        }
+
+        let size = 0
+        try {
+          size = fs.statSync(destPath).size
+        } catch (_) {}
 
         fileArr.push({
-          name: files[key].name,
-          mimetype: files[key].mimetype,
-          size: files[key].size
+          name: filename,
+          mimetype: part.mimetype,
+          size
         })
+      }
+    } else if (req.raw && req.raw.files) {
+      // Legacy fastify-file-upload shape: write in chunks to avoid INT32 write limit.
+      const files = req.raw.files
+      for (const key of Object.keys(files)) {
+        const f = files[key]
+        if (!f || !f.name || !f.data) {
+          continue
+        }
+        let filename
+        try {
+          filename = safeCaptureName(f.name)
+        } catch (err) {
+          reply.code(400)
+          return { err: 1, errstr: err.message }
+        }
+        const destPath = path.join(capturesPath(), filename)
+        const data = f.data
+        const CHUNK = 64 * 1024 * 1024
+        const fd = fs.openSync(destPath, 'w')
+        try {
+          for (let offset = 0; offset < data.length; offset += CHUNK) {
+            const end = Math.min(offset + CHUNK, data.length)
+            fs.writeSync(fd, data, offset, end - offset)
+          }
+        } finally {
+          fs.closeSync(fd)
+        }
+        fileArr.push({
+          name: filename,
+          mimetype: f.mimetype,
+          size: f.size != null ? f.size : data.length
+        })
+      }
     }
-    if (fileArr.length === 1) {
-      reply.code(200).send(fileArr[0])
-    } else {
-      reply.code(200).send(fileArr)
+
+    if (!fileArr.length) {
+      reply.code(400)
+      return { err: 1, errstr: 'no files uploaded' }
     }
+    return fileArr.length === 1 ? fileArr[0] : fileArr
   })
 
   next()
