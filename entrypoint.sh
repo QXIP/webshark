@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# sharkd daemon fails to start if the socket already exists
-rm "$SHARKD_SOCKET"
+# sharkd fails to start if a stale socket path already exists.
+# Use -f: path may be missing on first boot, and unix sockets are not regular files.
+if [ -n "${SHARKD_SOCKET}" ]; then
+  rm -f "${SHARKD_SOCKET}"
+fi
 
 dir_owner=$(stat -c "%U:%G" "${CAPTURES_PATH}")
 

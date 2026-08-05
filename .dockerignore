@@ -1,0 +1,7 @@
+api/node_modules
+**/node_modules
+.git
+captures
+*.pcap
+*.pcapng
+.DS_Store
