@@ -73,60 +73,57 @@ async function fetchStenoPcap (query) {
   return res
 }
 
-module.exports = function (fastify, opts, next) {
+module.exports = async function (fastify) {
   const max = Number(process.env.STENOGRAPHER_RATE_MAX) || 10
   const timeWindow = Number(process.env.STENOGRAPHER_RATE_TIME_WINDOW_MS) || 60 * 1000
+  const rateLimitConfig = { max, timeWindow }
 
-  // Rate-limit expensive Stenographer fetches that write into CAPTURES_PATH.
-  fastify.register(async function stenoQueryScope (scope) {
-    await scope.register(rateLimit, {
-      max,
-      timeWindow,
-      hook: 'preHandler',
-      errorResponseBuilder: function (_req, context) {
-        return {
-          err: 1,
-          errstr: 'rate limit exceeded, retry after ' + context.after,
-          statusCode: 429
-        }
+  await fastify.register(rateLimit, {
+    global: false,
+    max,
+    timeWindow,
+    errorResponseBuilder: function (_req, context) {
+      return {
+        err: 1,
+        errstr: 'rate limit exceeded, retry after ' + context.after,
+        statusCode: 429
       }
-    })
+    }
+  })
 
-    async function handleQuery (req, reply) {
-      const body = req.body || {}
-      const query = (req.query && req.query.query) || body.query
-      const name = safeName(
-        (req.query && req.query.name) || body.name,
-        'steno-' + Date.now() + '.pcap'
-      )
-      const dest = path.join(capturesPath(), name)
+  async function handleQuery (req, reply) {
+    const body = req.body || {}
+    const query = (req.query && req.query.query) || body.query
+    const name = safeName(
+      (req.query && req.query.name) || body.name,
+      'steno-' + Date.now() + '.pcap'
+    )
+    const dest = path.join(capturesPath(), name)
 
-      try {
-        const res = await fetchStenoPcap(query)
-        const out = fs.createWriteStream(dest)
-        const bodyStream = res.body && typeof res.body.getReader === 'function'
-          ? Readable.fromWeb(res.body)
-          : res.body
-        await pipeline(bodyStream, out)
-      } catch (err) {
-        try { fs.unlinkSync(dest) } catch (_) {}
-        reply.code(err.statusCode || 500)
-        return { err: 1, errstr: err.message || 'stenographer query failed' }
-      }
-
-      let size = 0
-      try { size = fs.statSync(dest).size } catch (_) {}
-      return { name, size, query: String(query).trim() }
+    try {
+      const res = await fetchStenoPcap(query)
+      const out = fs.createWriteStream(dest)
+      const bodyStream = res.body && typeof res.body.getReader === 'function'
+        ? Readable.fromWeb(res.body)
+        : res.body
+      await pipeline(bodyStream, out)
+    } catch (err) {
+      try { fs.unlinkSync(dest) } catch (_) {}
+      reply.code(err.statusCode || 500)
+      return { err: 1, errstr: err.message || 'stenographer query failed' }
     }
 
-    scope.get('/webshark/stenographer', handleQuery)
-    scope.post('/webshark/stenographer', handleQuery)
-  })
+    let size = 0
+    try { size = fs.statSync(dest).size } catch (_) {}
+    return { name, size, query: String(query).trim() }
+  }
+
+  // Per-route config so CodeQL js/missing-rate-limiting recognizes protection.
+  fastify.get('/webshark/stenographer', { config: { rateLimit: rateLimitConfig } }, handleQuery)
+  fastify.post('/webshark/stenographer', { config: { rateLimit: rateLimitConfig } }, handleQuery)
 
   fastify.get('/webshark/stenographer/status', async () => {
     const url = stenoUrl()
     return { enabled: Boolean(url), url: url || null }
   })
-
-  next()
 }
