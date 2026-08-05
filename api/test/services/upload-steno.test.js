@@ -89,6 +89,34 @@ test('stenographer status reports disabled without STENOGRAPHER_URL', async (t) 
   t.same(JSON.parse(res.body), { enabled: false, url: null })
 })
 
+test('stenographer query is rate limited', async (t) => {
+  process.env.STENOGRAPHER_URL = 'http://127.0.0.1:9'
+  process.env.STENOGRAPHER_RATE_MAX = '1'
+  process.env.STENOGRAPHER_RATE_TIME_WINDOW_MS = '60000'
+  delete require.cache[require.resolve('../../services/stenographer')]
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'webshark-steno-'))
+  process.env.CAPTURES_PATH = dir.endsWith(path.sep) ? dir : dir + path.sep
+
+  const app = Fastify()
+  app.register(require('../../services/stenographer'))
+  t.teardown(async () => {
+    await app.close()
+    delete process.env.STENOGRAPHER_URL
+    delete process.env.STENOGRAPHER_RATE_MAX
+    delete process.env.STENOGRAPHER_RATE_TIME_WINDOW_MS
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
+  await app.ready()
+
+  const first = await app.inject({ method: 'GET', url: '/webshark/stenographer?query=port%205060' })
+  // Upstream is unreachable → 500/502, but request counted against rate limit.
+  t.ok(first.statusCode === 500 || first.statusCode === 502 || first.statusCode === 501)
+
+  const second = await app.inject({ method: 'GET', url: '/webshark/stenographer?query=port%205060' })
+  t.equal(second.statusCode, 429)
+})
+
 test('files listing returns pcap sizes as numbers', async (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'webshark-files-'))
   process.env.CAPTURES_PATH = dir.endsWith(path.sep) ? dir : dir + path.sep
