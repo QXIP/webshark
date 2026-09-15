@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap --no-coverage test/services/upload-steno.test.js",
-    "test:all": "tap test/**/*.test.js",
+    "test": "tap --no-coverage test/**/*.test.js",
+    "test:all": "tap --no-coverage test/**/*.test.js",
     "start": "npx fastify start -l info app.js -a 0.0.0.0 -p 8085",
     "dev": "fastify start -l info -P app.js -a 0.0.0.0 -p 8085"
   },

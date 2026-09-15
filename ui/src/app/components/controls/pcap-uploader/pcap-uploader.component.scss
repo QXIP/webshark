@@ -1,0 +1,94 @@
+.file-upload-container {
+	position: relative;
+	height: 100%;
+
+	&>.fileselect {
+		align-items: center;
+		background-color: #eee;
+		border-radius: 1rem;
+		border-style: dashed;
+		color: #999;
+		cursor: pointer;
+		display: flex;
+		height: 100%;
+		justify-content: center;
+		margin: 0;
+		min-width: 200px;
+		padding: 1rem;
+
+		&::before {
+			content: "Drop PCAP file here";
+		}
+		&.client-only::before {
+			content: "Drop a PCAP to analyze in this browser";
+		}
+
+		&.drugOver {
+			background-color: #ccc;
+		}
+	}
+
+	&>input[type="file"] {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		bottom: 0;
+		right: 0;
+		cursor: pointer;
+		opacity: 0;
+	}
+}
+
+.lds-container {
+	width: 100%;
+	height: 100%;
+	background: #fafafa;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 6px;
+	z-index: 1000;
+}
+.lds-ring {
+	display: inline-block;
+	position: relative;
+	width: 80px;
+	height: 80px;
+}
+
+.lds-ring div {
+	box-sizing: border-box;
+	display: block;
+	position: absolute;
+	width: 64px;
+	height: 64px;
+	margin: 8px;
+	border: 8px solid #26bfbc;
+	border-radius: 50%;
+	animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+	border-color: #26bfbc transparent transparent transparent;
+}
+
+.lds-ring div:nth-child(1) {
+	animation-delay: -0.45s;
+}
+
+.lds-ring div:nth-child(2) {
+	animation-delay: -0.3s;
+}
+
+.lds-ring div:nth-child(3) {
+	animation-delay: -0.15s;
+}
+
+@keyframes lds-ring {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}

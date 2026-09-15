@@ -1,0 +1,16 @@
+.local/
+node_modules
+api/node_modules
+ui/node_modules
+ui/.angular
+ui/dist
+ui/coverage
+api/coverage
+api/.nyc_output
+web/
+captures/
+*.pcap
+*.pcapng
+.DS_Store
+.idea
+.vscode

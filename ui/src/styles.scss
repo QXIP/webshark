@@ -1,0 +1,41 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+* {
+  box-sizing: border-box;
+
+  /** SAFARY SCROLL FIX */
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+    height: 7px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(199, 199, 199, 0.748);
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+  }
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-mdc-menu-panel {
+  max-width: initial !important;
+}
+.mat-mdc-menu-item {
+  min-height: initial !important;
+  padding: 4px !important;
+}

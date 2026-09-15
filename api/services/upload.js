@@ -6,7 +6,7 @@ const { pipeline } = require('stream/promises')
 const multipart = require('@fastify/multipart')
 const rateLimit = require('@fastify/rate-limit')
 
-const MAX_FILE_SIZE = Number(process.env.UPLOAD_MAX_BYTES) || Infinity
+const MAX_FILE_SIZE = Number(process.env.UPLOAD_MAX_BYTES) || (2 * 1024 * 1024 * 1024)
 
 function capturesPath () {
   const p = process.env.CAPTURES_PATH || '/captures/'

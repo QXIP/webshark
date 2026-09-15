@@ -1,0 +1,82 @@
+<isData class="is-data-wrapper" [noDataIf]="calls.length === 0">
+  <div class="voip-layout">
+    <div class="voip-toolbar">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        [disabled]="selectedCount === 0"
+        (click)="playStreams()"
+      >
+        <mat-icon>play_arrow</mat-icon>
+        Play Streams
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="selectedCount === 0 && !activeId"
+        (click)="flowSequence()"
+      >
+        Flow Sequence
+      </button>
+      <button
+        *ngIf="flowData"
+        mat-stroked-button
+        type="button"
+        (click)="closeFlow()"
+      >
+        Calls
+      </button>
+      <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
+    </div>
+
+    <div class="voip-flow" *ngIf="flowData">
+      <tap-flow [data]="flowData"></tap-flow>
+    </div>
+
+    <div class="voip-table-wrap" *ngIf="!flowData">
+      <table class="voip-table">
+        <thead>
+          <tr>
+            <th class="check"></th>
+            <th>Start</th>
+            <th>Stop</th>
+            <th>Initial Speaker</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Protocol</th>
+            <th>Packets</th>
+            <th>State</th>
+            <th>Comments</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let call of calls"
+            (click)="rowClick(call)"
+            [class.active]="activeId === call.id"
+            [class.checked]="call.__selected"
+          >
+            <td class="check" (click)="$event.stopPropagation()">
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="call.__selected"
+                (click)="$event.stopPropagation()"
+                (ngModelChange)="onCheck()"
+              ></mat-checkbox>
+            </td>
+            <td>{{ formatTime(call.start) }}</td>
+            <td>{{ formatTime(call.stop) }}</td>
+            <td>{{ call.initial }}</td>
+            <td>{{ call.from }}</td>
+            <td>{{ call.to }}</td>
+            <td>{{ call.proto }}</td>
+            <td>{{ call.packets }}</td>
+            <td>{{ call.state }}</td>
+            <td>{{ call.comments }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</isData>

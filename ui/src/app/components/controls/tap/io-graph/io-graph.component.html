@@ -1,0 +1,10 @@
+<div class="io-graph">
+  <p *ngIf="loading">Loading I/O graph…</p>
+  <flexible-chart
+    *ngIf="chartData?.length"
+    [data]="chartData"
+    typeOfChart="bar"
+    [isRange]="false"
+    [options]="{ axisX: true, axisY: true }"
+  ></flexible-chart>
+</div>

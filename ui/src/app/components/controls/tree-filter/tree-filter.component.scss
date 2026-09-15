@@ -1,0 +1,87 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@import "/src/theme.scss";
+$primary: map.get($my-theme, 'primary');
+
+.selected {
+  background-color: mat.get-color-from-palette($primary);
+  color: white;
+}
+
+:host ::ng-deep .mat-tree-node {
+  min-height: 24px;
+  font-family: monospace;
+  font-size: 10pt;
+  margin-bottom: -1px;
+  overflow-wrap: anywhere;
+  justify-content: space-between;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}
+
+:host ::ng-deep .mat-tree-node.menu {
+  min-height: 2rem;
+}
+
+:host ::ng-deep .mat-icon-button {
+  margin: -0.5rem 0;
+  transform: scale(0.7);
+}
+
+
+:host {
+  .filter-tree-node {
+    height: 1rem;
+  }
+  .field-sticky {
+    font-family: monospace;
+    top: 0px;
+    left: 0px;
+    position: sticky;
+    background-color: mat.get-color-from-palette($primary, default-contrast);
+    width: 100%;
+    z-index: 1;
+    padding: 0.5rem;
+    border: 0;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+
+    &.color {
+      color: transparent;
+      background-color: transparent;
+      margin-top: -10px;
+      height: 3px;
+      border: 0;
+      padding-top: 0;
+      // padding-bottom: 0;
+      top: 27px;
+      overflow: hidden;
+      letter-spacing: -0.3px;
+    }
+  }
+
+  .files {
+    transform: scale(0.8);
+    margin-left: -0.5rem;
+    margin-right: 0.5rem;
+
+    &.file {
+      opacity: 0.7;
+    }
+  }
+
+  .line-html {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  &>div {
+    flex: 1;
+    overflow: auto;
+  }
+}

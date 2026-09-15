@@ -1,0 +1,49 @@
+<mat-button-toggle-group
+  aria-label="Font Style"
+  value="Files"
+  #group="matButtonToggleGroup"
+  [style.display]="isKIOSK && 'none'"
+>
+  <mat-button-toggle
+    value="Files"
+    [checked]="!isFile"
+    (click)="isFile = false; getFiles()"
+    >Files</mat-button-toggle
+  >
+  <mat-button-toggle value="Menu" [checked]="isFile">Menu</mat-button-toggle>
+</mat-button-toggle-group>
+
+<div style="height: 1rem; width: 200px; overflow: auto"></div>
+<ng-container *ngIf="isKIOSK; else default">
+  <app-menu></app-menu>
+</ng-container>
+<ng-template #default>
+  <ng-container [ngSwitch]="group.value">
+    <ng-template ngSwitchCase="Files">
+      <as-split
+        direction="vertical"
+        [gutterSize]="5"
+        [style.max-height]="'calc(100% - 4rem - 3px)'"
+      >
+        <as-split-area [size]="80">
+          <div>
+            <tree-filter
+              [data]="files"
+              [isFilter]="false"
+              [fileIcon]="true"
+              (clickRow)="onFileChoose($event)"
+            ></tree-filter>
+          </div>
+        </as-split-area>
+        <as-split-area [size]="20">
+          <div style="min-height: 100px; min-width: 200px; height: 100%">
+            <pcap-uploader></pcap-uploader>
+          </div>
+        </as-split-area>
+      </as-split>
+    </ng-template>
+    <ng-template ngSwitchCase="Menu">
+      <app-menu></app-menu>
+    </ng-template>
+  </ng-container>
+</ng-template>

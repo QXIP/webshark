@@ -1,0 +1,19 @@
+<div class="follow-stream">
+  <div class="follow-toolbar">
+    <button
+      mat-stroked-button
+      type="button"
+      [disabled]="flowBusy || !filter"
+      (click)="showFlowGraph()"
+    >
+      {{ flowData ? 'Stream contents' : 'Flow Graph' }}
+    </button>
+    <span class="follow-meta" *ngIf="meta">{{ meta }}</span>
+    <span class="follow-filter" *ngIf="filter">{{ filter }}</span>
+  </div>
+  <p class="follow-error" *ngIf="error">{{ error }}</p>
+  <div class="follow-flow" *ngIf="flowData">
+    <tap-flow [data]="flowData"></tap-flow>
+  </div>
+  <pre class="follow-payload" *ngIf="!flowData && chunks.length"><span *ngFor="let chunk of chunks" class="chunk" [class.server]="chunk.s" (click)="selectChunk(chunk)">{{ chunk.d }}</span></pre>
+</div>

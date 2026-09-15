@@ -1,0 +1,50 @@
+.follow-stream {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.4rem 0.6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+.follow-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+}
+.follow-meta {
+  color: #333;
+  font-weight: 600;
+}
+.follow-filter {
+  color: #666;
+  font-size: 12px;
+}
+.follow-error {
+  color: #b71c1c;
+}
+.follow-flow {
+  min-height: 160px;
+  flex: 1;
+}
+.follow-payload {
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+.chunk {
+  color: #b71c1c;
+  cursor: pointer;
+}
+.chunk.server {
+  color: #0d47a1;
+}

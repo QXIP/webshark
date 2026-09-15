@@ -1,7 +1,12 @@
 api/node_modules
+ui/node_modules
+ui/.angular
 **/node_modules
 .git
+ui/.git
 captures
 *.pcap
 *.pcapng
 .DS_Store
+web
+.local

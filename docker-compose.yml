@@ -13,9 +13,8 @@ services:
     volumes:
       - ./captures:/captures
     environment:
-      # Keep socket under CAPTURES_PATH (writable, exclusive to this volume).
-      - SHARKD_SOCKET=/captures/sharkd.sock
       - CAPTURES_PATH=/captures/
+      - UPLOAD_MAX_BYTES=2147483648
       # Optional Stenographer bridge (#42):
       # - STENOGRAPHER_URL=https://steno.example.com:1234
       # - STENOGRAPHER_PACKET_LIMIT=100000

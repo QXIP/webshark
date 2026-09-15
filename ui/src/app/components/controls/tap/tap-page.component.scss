@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+:host ::ng-deep isData,
+:host ::ng-deep .is-data-wrapper,
+:host ::ng-deep .is-data-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+:host ::ng-deep tap-rtp-streams,
+:host ::ng-deep tap-voip-calls,
+:host ::ng-deep tap-flow,
+:host ::ng-deep follow-stream,
+:host ::ng-deep io-graph,
+:host ::ng-deep chart-and-table,
+:host ::ng-deep .frame-detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+.frame-detail {
+  overflow: hidden;
+}
+.frame-tree {
+  flex: 1 1 55%;
+  min-height: 0;
+  overflow: auto;
+}
+.frame-hex {
+  flex: 0 0 38%;
+  min-height: 8rem;
+  overflow: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}

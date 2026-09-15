@@ -1,0 +1,88 @@
+<div class="on-top modal-resizable"
+    #layerZIndex>
+    <div [className]="isNonWindow || isFullPage ? 'detail-container full-page' : 'detail-container'"
+        (mousedown)="onFocus()"
+        #containerWindow>
+        <mat-toolbar class="title" *ngIf="!isNonWindow"
+            color="primary"
+            (dblclick)="onFullPage()"
+            [ngStyle]="{'background-color': headerColor}"
+            (mousedown)="onStartMove($event)">
+            <!-- START:ARROWS -->
+            <div *ngIf="!!arrowMetaData"
+                class="toolbar-actions"
+                (mousedown)="$event.stopPropagation()"
+                (mouseover)="_noLayout = true"
+                (mouseout)="_noLayout = false">
+                <button mat-icon-button
+                    *ngIf="arrowMetaData.isLeft"
+                    class="button-icon-right-top"
+                    (click)="clickArrowLeft($event)">
+                    <fa-icon icon="arrow-left"></fa-icon>
+                </button>
+                <button mat-icon-button
+                    *ngIf="arrowMetaData.isRight"
+                    class="button-icon-right-top"
+                    (click)="clickArrowRight($event)">
+                    <fa-icon icon="arrow-right"></fa-icon>
+                </button>
+            </div>
+            <!-- END:ARROWS -->
+            <div class="toolbar-title"> {{ title }} </div>
+            <div class="toolbar-actions"
+                (mousedown)="$event.stopPropagation()"
+                (mouseover)="_noLayout = true"
+                (mouseout)="_noLayout = false">
+                <button mat-icon-button
+                    type="button"
+                    (click)="onFullPage()">
+                    <mat-icon *ngIf="!isFullPage">fullscreen</mat-icon>
+                    <mat-icon *ngIf="isFullPage">fullscreen_exit</mat-icon>
+                </button>
+                <button mat-icon-button
+                    type="button"
+                    [hidden]="!isOutsideButton"
+                    (click)="newWindow()">
+                    <mat-icon>flip_to_front</mat-icon>
+                </button>
+                <button mat-icon-button
+                    type="button"
+                    (click)="onClose()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+        </mat-toolbar>
+        <div class="inside-content">
+            <div class="modal-body"
+                (wheel)="onWheel($event)"
+                #inWindow>
+                <ng-content></ng-content>
+            </div>
+        </div>
+
+        <!-- 
+      Resizable conrols 
+    -->
+        <div *ngFor="let item of ['left','right','bottom','top']"
+            [className]="'resize '+item"
+            (mousedown)="onResize($event, item)"
+            (mouseup)="afterResize()">
+        </div>
+        <div *ngFor="let item of ['tl','tr','bl','br']"
+            [className]="'resize corner '+ item"
+            (mousedown)="onResize($event, item)"
+            (mouseup)="afterResize()"></div>
+    </div>
+</div>
+
+<app-window [isWindow]="__isBrowserWindow"
+    [width]="width"
+    [height]="height"
+    [objectData]="objectData"
+    [sharedUrl]="sharedUrl"
+    (close)="onWindowClose($event)">
+
+    <div class="out-window"
+        #outWindow></div>
+
+</app-window>

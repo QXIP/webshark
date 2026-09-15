@@ -1,0 +1,144 @@
+<div class="body-container">
+  <mat-toolbar color="primary" style="min-height: auto">
+    <mat-toolbar-row style="flex-wrap: wrap; height: auto">
+
+      <button type="button" class="brand" *ngIf="!isEmbed" (click)="goHome()">WebShark</button>
+      <button
+        mat-raised-button
+        *ngIf="captureFile"
+        (click)="downloadCapture()"
+      >
+        <mat-icon class="mat-18">download</mat-icon>
+        {{ captureFile }}
+      </button>
+      <span style="flex: 1"></span>
+      <button mat-button *ngIf="captureFile && !isEmbed && !isClientOnly" (click)="copyShareLink()">Share</button>
+      <flexible-chart
+        *ngIf="!isEmbed"
+        chart
+        style="flex: 3; min-width: 240px; height: 2.5rem"
+        [typeOfChart]="typeOfChart"
+        (range)="webShark.range = $event"
+        [data]="chartSeries"
+        #headerChart
+      ></flexible-chart>
+      <button mat-icon-button [matMenuTriggerFor]="menuSettings" *ngIf="!isEmbed">
+        <mat-icon>settings</mat-icon>
+        <mat-menu #menuSettings="matMenu">
+          <div>
+
+            <div style="padding: 1rem; display: flex">
+              <mat-radio-group aria-label="Chart settings">
+                <mat-radio-button
+                  color="primary"
+                  (click)="typeOfChart = 'line'"
+                  value="line"
+                  >Line</mat-radio-button
+                >
+                <mat-radio-button
+                  color="primary"
+                  (click)="typeOfChart = 'bar'"
+                  value="bar"
+                  >Bar</mat-radio-button
+                >
+                <mat-radio-button
+                  color="primary"
+                  (click)="typeOfChart = 'area'"
+                  value="area"
+                  checked
+                  >Area</mat-radio-button
+                >
+              </mat-radio-group>
+            </div>
+            <div
+              style="
+                padding: 0rem;
+                padding-bottom: 1rem;
+                width: 390px;
+                display: flex;
+                justify-content: space-around;
+              "
+            >
+              <button
+                mat-button
+                (click)="framePosition = ['vertical', 'horizontal']"
+              >
+                <div style="width: 60px; height: 60px; padding-top: 5px">
+                  <mat-grid-list cols="2" rowHeight="25px">
+                    <mat-grid-tile
+                      [colspan]="2"
+                      class="grid-content"
+                    ></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                  </mat-grid-list>
+                </div>
+              </button>
+              <button
+                mat-button
+                (click)="framePosition = ['horizontal', 'vertical']"
+              >
+                <div style="width: 60px; height: 60px; padding-top: 5px">
+                  <mat-grid-list cols="2" rowHeight="25px">
+                    <mat-grid-tile
+                      [rowspan]="2"
+                      class="grid-content"
+                    ></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                  </mat-grid-list>
+                </div>
+              </button>
+              <button
+                mat-button
+                (click)="framePosition = ['horizontal', 'horizontal']"
+              >
+                <div style="width: 60px; height: 60px; padding-top: 5px">
+                  <mat-grid-list cols="3" rowHeight="50px">
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                  </mat-grid-list>
+                </div>
+              </button>
+              <button
+                mat-button
+                (click)="framePosition = ['vertical', 'vertical']"
+              >
+                <div style="width: 60px; height: 60px; padding-top: 5px">
+                  <mat-grid-list cols="1" rowHeight="16px">
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                    <mat-grid-tile class="grid-content"></mat-grid-tile>
+                  </mat-grid-list>
+                </div>
+              </button>
+            </div>
+          </div>
+
+        </mat-menu>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="side" [opened]="false">
+      <app-files-page *ngIf="!isKIOSK && !isClientOnly" [isFile]="!isFileOnLink"></app-files-page>
+    </mat-drawer>
+    <div class="example-sidenav-content">
+      <app-webshark
+        [fileList]="files"
+        [framePosition]="framePosition"
+        (ready)="onChartReady($event)"
+        #webShark
+      ></app-webshark>
+    </div>
+  </mat-drawer-container>
+</div>
+
+<modal-resizable
+  *ngFor="let dialog of dialogs; let idx = index"
+  [title]="dialog.name || tapPage.title || '. . .'"
+  (close)="onClose(idx)"
+>
+  <tap-page [taplink]="dialog.link" #tapPage></tap-page>
+</modal-resizable>

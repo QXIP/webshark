@@ -1,0 +1,11 @@
+{
+  "name": "webshark",
+  "private": true,
+  "scripts": {
+    "build:ui": "npm --prefix ui run build && rm -rf web && mkdir -p web && cp -a ui/dist/webshark/. web/",
+    "build:static": "npm --prefix ui run build:static",
+    "start": "npm run build:ui && npm --prefix api start",
+    "dev": "npm --prefix api run dev",
+    "test": "npm --prefix api test && npm --prefix ui test"
+  }
+}
