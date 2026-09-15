@@ -50,8 +50,6 @@ jobs:
           push: true
           build-args: |
             WEBSHARK_UI_MODE=${{ steps.ui.outputs.mode }}
-            WIRESHARK_REF=v4.4.6
-            SHARKD_BUILD_JOBS=4
           tags: |
              ghcr.io/qxip/webshark:latest
              ghcr.io/qxip/webshark:${{ github.event.release.tag_name || github.sha }}

@@ -9,6 +9,5 @@ module.exports = function (fastify, opts, next) {
     options: Object.assign({}, opts)
   })
 
-  // Make sure to call next when done
   next()
 }

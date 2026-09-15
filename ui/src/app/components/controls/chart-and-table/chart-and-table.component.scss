@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+:host ::ng-deep as-split {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}

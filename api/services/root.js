@@ -2,11 +2,50 @@
 const fs = require('fs')
 const path = require('path')
 const rateLimit = require('@fastify/rate-limit')
-const sharkd_dict = require('../custom_module/sharkd_dict')
+const {
+  isCaptureFile,
+  listCaptureFiles,
+  watchEvent,
+  captureChangeKind,
+  safeCaptureBasename
+} = require('../custom_module/captures')
 
 function capturesPath () {
   const p = process.env.CAPTURES_PATH || '/captures/'
   return p.endsWith(path.sep) ? p : p + path.sep
+}
+
+function filesResponse (reply) {
+  try {
+    reply.send(JSON.stringify(listCaptureFiles(capturesPath(), [])))
+  } catch (err) {
+    reply.code(500).send(JSON.stringify({ err: 1, errstr: 'cannot read captures' }))
+  }
+}
+
+function resolveCapture (name) {
+  let base
+  try {
+    base = safeCaptureBasename(name)
+  } catch (_) {
+    return null
+  }
+  if (String(name || '').includes('..')) {
+    return null
+  }
+  const full = path.join(capturesPath(), base)
+  if (!fs.existsSync(full) || !isCaptureFile(base, full)) {
+    return null
+  }
+  return { base, full }
+}
+
+function sendCaptureFile (reply, resolved, asAttachment) {
+  if (asAttachment) {
+    reply.header('Content-Disposition', 'attachment; filename="' + resolved.base + '"')
+  }
+  reply.header('Content-Type', 'application/octet-stream')
+  return reply.send(fs.createReadStream(resolved.full))
 }
 
 module.exports = async function (fastify) {
@@ -20,13 +59,17 @@ module.exports = async function (fastify) {
     timeWindow
   })
 
-  fastify.register(require('@fastify/static'), {
-    root: capturesPath(),
-    prefix: '/webshark//', // defeat unique prefix
-  })
-
   fastify.get('/', async (req, res) => {
     res.redirect('/webshark')
+  })
+
+  fastify.get('/webshark/captures/:name', { config: { rateLimit: rateLimitConfig } }, async function (request, reply) {
+    const resolved = resolveCapture(request.params.name)
+    if (!resolved) {
+      reply.code(404).send({ err: 1, errstr: 'not found' })
+      return
+    }
+    return sendCaptureFile(reply, resolved, false)
   })
 
   fastify.get('/webshark/json', { config: { rateLimit: rateLimitConfig } }, function (request, reply) {
@@ -34,100 +77,88 @@ module.exports = async function (fastify) {
       return
     }
 
-    if (request.query.method === 'files') {
-      const capPath = capturesPath()
-      let files = []
-      try {
-        files = fs.readdirSync(capPath)
-      } catch (err) {
-        reply.code(500).send(JSON.stringify({ err: 1, errstr: 'cannot read captures' }))
-        return
-      }
-
-      const results = { files: [], pwd: '.' }
-      let loaded_files = []
-      try {
-        loaded_files = sharkd_dict.get_loaded_sockets() || []
-      } catch (_) {}
-
-      for (const pcap_file of files) {
-        if (!pcap_file.endsWith('.pcap')) {
-          continue
-        }
-        // Skip path traversal / odd names
-        if (pcap_file.includes('..') || pcap_file.includes('/') || pcap_file.includes('\\')) {
-          continue
-        }
-        let pcap_stats
-        try {
-          pcap_stats = fs.statSync(path.join(capPath, pcap_file))
-        } catch (_) {
-          continue
-        }
-        if (!pcap_stats.isFile()) {
-          continue
-        }
-        const entry = { name: pcap_file, size: pcap_stats.size }
-        if (loaded_files.includes(pcap_file)) {
-          entry.status = { online: true }
-        }
-        results.files.push(entry)
-      }
-      reply.send(JSON.stringify(results))
+    const method = request.query.method
+    if (method === 'files') {
+      filesResponse(reply)
       return
     }
 
-    if (request.query.method === 'download') {
-      if (!('capture' in request.query)) {
+    if (method === 'download') {
+      if (!('capture' in request.query) || String(request.query.capture).includes('..')) {
         reply.send(JSON.stringify({ err: 1, errstr: 'Nope' }))
         return
       }
-      if (request.query.capture.includes('..')) {
-        reply.send(JSON.stringify({ err: 1, errstr: 'Nope' }))
+      if (request.query.token !== 'self') {
+        reply.code(400).send(JSON.stringify({ err: 1, errstr: 'download tokens are handled in the browser' }))
         return
       }
-
-      let cap_file = request.query.capture
-      if (cap_file.startsWith('/')) {
-        cap_file = cap_file.substr(1)
-      }
-
-      if (!('token' in request.query)) {
-        reply.send(JSON.stringify({ err: 1, errstr: 'Nope' }))
+      const resolved = resolveCapture(request.query.capture)
+      if (!resolved) {
+        reply.code(404).send(JSON.stringify({ err: 1, errstr: 'not found' }))
         return
       }
+      return sendCaptureFile(reply, resolved, true)
+    }
 
-      if (request.query.token === 'self') {
-        reply.header('Content-disposition', 'attachment; filename=' + cap_file)
-        reply.sendFile(cap_file)
+    reply.code(400).send(JSON.stringify({ err: 1, errstr: `method not allowed: ${method}` }))
+  })
+
+  fastify.get('/webshark/watch', { config: { rateLimit: rateLimitConfig } }, async function (request, reply) {
+    const capture = request.query && request.query.capture
+    if (!capture || String(capture).includes('..')) {
+      reply.code(400).send({ err: 1, errstr: 'invalid capture' })
+      return
+    }
+    const resolved = resolveCapture(capture)
+    if (!resolved) {
+      const base = path.basename(String(capture))
+      const full = path.join(capturesPath(), base)
+      if (!fs.existsSync(full)) {
+        reply.code(404).send({ err: 1, errstr: 'not found' })
         return
       }
-
-      sharkd_dict.send_req(request.query).then((data) => {
-        try {
-          data = JSON.parse(data)
-          reply.header('Content-Type', data.mime)
-          reply.header('Content-disposition', 'attachment; filename="' + data.file + '"')
-          const buff = Buffer.from(data.data, 'base64')
-          reply.send(buff)
-        } catch (err) {
-          reply.send(JSON.stringify({ err: 1, errstr: 'Nope' }))
-        }
-      })
+      reply.code(400).send({ err: 1, errstr: 'invalid capture' })
       return
     }
 
-    if (
-      request.query.method === 'tap' &&
-      'tap0' in request.query &&
-      ['srt:dcerpc', 'srt:rpc', 'srt:scsi', 'rtd:megaco'].includes(request.query.tap0)
-    ) {
-      reply.send(null)
-      return
-    }
-
-    sharkd_dict.send_req(request.query).then((data) => {
-      reply.send(data)
+    reply.hijack()
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive'
     })
+
+    let prevSize = -1
+    const send = (event, data) => {
+      try {
+        reply.raw.write(watchEvent(event, data))
+      } catch (_) {}
+    }
+
+    const tick = async () => {
+      let st
+      try {
+        st = fs.statSync(resolved.full)
+      } catch (_) {
+        return
+      }
+      const kind = captureChangeKind(prevSize, st.size)
+      if (kind === 'none') {
+        return
+      }
+      prevSize = st.size
+      send('capture-changed', { size: st.size, mtime: st.mtimeMs, kind })
+    }
+
+    await tick()
+    fs.watchFile(resolved.full, { interval: 400 }, () => { tick() })
+    const heartbeat = setInterval(() => send('heartbeat', { t: Date.now() }), 15000)
+
+    const stop = () => {
+      fs.unwatchFile(resolved.full)
+      clearInterval(heartbeat)
+    }
+    request.raw.on('close', stop)
+    request.raw.on('end', stop)
   })
 }

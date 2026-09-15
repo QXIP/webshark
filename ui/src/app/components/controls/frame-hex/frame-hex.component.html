@@ -1,0 +1,56 @@
+<div class="panel">
+  <mat-button-toggle-group
+    aria-label="Font Style"
+    value="HEX"
+    appearance="legacy"
+    #mode="matButtonToggleGroup"
+  >
+    <mat-button-toggle value="HEX">HEX</mat-button-toggle>
+    <mat-button-toggle value="BINARY">BINARY</mat-button-toggle>
+    <mat-button-toggle value="TEXT">TEXT</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+<div #tableHex>
+  <ng-container *ngIf="mode.value === 'TEXT'">
+    <div
+      style="font-family: monospace"
+    >
+      <pre>
+        {{toTextPre(hexCode)}}
+        <!-- <span style="word-wrap: break-word;" *ngFor="let row of hexCode">
+          <ng-container  *ngFor="let char of row">{{ toCharFromHex(char) }}</ng-container>
+        </span> -->
+      </pre>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="mode.value != 'TEXT'">
+    <div
+      *ngFor="
+        let row of mode.value === 'BINARY' ? binaryCode : hexCode;
+        let rowId = index
+      "
+      [id]="'row-' + rowId"
+      style="display: flex; justify-content: flex-start; font-family: monospace"
+    >
+      <div class="col-index" style="background-color: lightgray">
+        {{ indexColumnValue(rowId, mode.value === "BINARY" ? 8 : 16) }}
+      </div>
+      <div
+        class="col-hex"
+        [class.selected]="isSelected(rowId, colId, mode)"
+        (click)="onClick(rowId, colId, mode)"
+        *ngFor="let hex of row; let colId = index"
+      >
+        {{ mode.value === "BINARY" ? hexToBinary(hex) : hex }}
+      </div>
+      <span style="width: 0.5rem"></span>
+      <span
+        class="col-char"
+        (click)="onClick(rowId, colId, mode)"
+        [class.selected]="isSelected(rowId, colId, mode)"
+        *ngFor="let char of row; let colId = index"
+        >{{ toCharFromHex(char) }}</span
+      >
+    </div>
+  </ng-container>
+</div>

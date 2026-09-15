@@ -1,0 +1,112 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.seq {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  font-size: 12px;
+}
+.seq-head,
+.seq-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 28px;
+}
+.seq-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  font-weight: 600;
+}
+.seq-time {
+  flex: 0 0 6.5rem;
+  padding: 0.2rem 0.4rem;
+  display: flex;
+  align-items: center;
+  background: #eee;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.seq-lanes {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+.seq-host,
+.seq-lane {
+  flex: 1;
+  min-width: 6rem;
+  text-align: center;
+  padding: 0.2rem;
+}
+.seq-host {
+  border-bottom: 1px solid #999;
+}
+.seq-lane {
+  position: relative;
+}
+.seq-vline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 1px dashed #bbb;
+}
+.seq-row {
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  &:hover {
+    background: rgba(63, 81, 181, 0.06);
+  }
+  &.selected {
+    background: rgba(63, 81, 181, 0.16);
+  }
+}
+.seq-msg {
+  position: absolute;
+  top: 4px;
+  height: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: center;
+  min-width: 4rem;
+  pointer-events: none;
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8em;
+    color: #222;
+    padding: 0 0.25rem;
+  }
+}
+.seq-arrow {
+  border-bottom: 2px solid currentColor;
+  position: relative;
+  width: 100%;
+  height: 0;
+  &::after {
+    content: "";
+    border: 5px solid transparent;
+    border-left: 8px solid currentColor;
+    position: absolute;
+    right: -2px;
+    bottom: -6px;
+  }
+  &.left::after {
+    border-left: 5px solid transparent;
+    border-right: 8px solid currentColor;
+    right: auto;
+    left: -2px;
+  }
+}

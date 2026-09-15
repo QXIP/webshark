@@ -1,0 +1,7 @@
+.subMenu {
+  // display: grid;
+  // grid-template-columns: 1fr 1fr;
+}
+::ng-deep .mat-menu-panel {
+  max-width: initial !important;
+}

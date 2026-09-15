@@ -117,36 +117,28 @@ test('stenographer query is rate limited', async (t) => {
   t.equal(second.statusCode, 429)
 })
 
-test('files listing returns pcap sizes as numbers', async (t) => {
+test('files listing returns pcap and pcapng sizes as numbers', async (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'webshark-files-'))
   process.env.CAPTURES_PATH = dir.endsWith(path.sep) ? dir : dir + path.sep
   fs.writeFileSync(path.join(dir, 'a.pcap'), Buffer.alloc(10))
+  fs.writeFileSync(path.join(dir, 'b.pcapng'), Buffer.alloc(20))
   fs.writeFileSync(path.join(dir, 'ignore.txt'), 'x')
-
-  const Module = require('module')
-  const original = Module.prototype.require
-  Module.prototype.require = function (id) {
-    if (String(id).includes('sharkd_dict')) {
-      return { get_loaded_sockets: () => [], send_req: async () => '{}' }
-    }
-    return original.apply(this, arguments)
-  }
-  t.teardown(() => {
-    Module.prototype.require = original
-    fs.rmSync(dir, { recursive: true, force: true })
-  })
 
   const rootPath = require.resolve('../../services/root')
   delete require.cache[rootPath]
   const app = Fastify()
   app.register(require('../../services/root'))
-  t.teardown(() => app.close())
+  t.teardown(async () => {
+    await app.close()
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
   await app.ready()
 
   const res = await app.inject({ method: 'GET', url: '/webshark/json?method=files' })
   t.equal(res.statusCode, 200)
   const body = JSON.parse(res.body)
-  t.equal(body.files.length, 1)
-  t.equal(body.files[0].name, 'a.pcap')
-  t.equal(body.files[0].size, 10)
+  t.equal(body.files.length, 2)
+  const byName = Object.fromEntries(body.files.map((f) => [f.name, f]))
+  t.equal(byName['a.pcap'].size, 10)
+  t.equal(byName['b.pcapng'].size, 20)
 })

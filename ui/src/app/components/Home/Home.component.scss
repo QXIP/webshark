@@ -1,0 +1,60 @@
+
+.mat-radio-button ~ .mat-radio-button {
+  margin-left: 16px;
+}
+
+.grid-content {
+  padding: 2px;
+  // margin: 2px;
+  background-color: white;
+  border: 1px solid #999;
+}
+
+.body-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.brand {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  padding: 0 1rem 0 0;
+  cursor: pointer;
+  line-height: inherit;
+}
+.brand:hover {
+  opacity: 0.85;
+}
+
+.example-container {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.example-sidenav-content {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+
+  app-webshark {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.example-sidenav {
+  padding: 0rem;
+  min-width: 10rem;
+}
+

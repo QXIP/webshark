@@ -1,0 +1,87 @@
+<input
+  #fileOpen
+  type="file"
+  hidden
+  accept=".pcapng,.pcap,.cap,application/vnd.tcpdump.pcap"
+  (change)="onLocalFilePicked($event)"
+/>
+
+<div *ngIf="hasCapture" class="menu-stat">
+  <button mat-button [matMenuTriggerFor]="fileMenu">File</button>
+  <button mat-button [matMenuTriggerFor]="analyzeMenu">Analyze</button>
+  <button mat-button [matMenuTriggerFor]="statisticsMenu">Statistics</button>
+  <button mat-button [matMenuTriggerFor]="telephonyMenu">Telephony</button>
+</div>
+
+<mat-menu #fileMenu="matMenu">
+  <button mat-menu-item (click)="openLocalCapture()">
+    <mat-icon>folder_open</mat-icon>
+    <span>Open Capture…</span>
+  </button>
+  <button mat-menu-item (click)="closeCapture()">
+    <mat-icon>close</mat-icon>
+    <span>Close Capture</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item [disabled]="exporting" (click)="exportSpecifiedPackets()">
+    <mat-icon>filter_alt</mat-icon>
+    <span>{{ hasFilter ? 'Export Specified Packets' : 'Export Packets as PCAP' }}</span>
+  </button>
+  <button mat-menu-item (click)="downloadCapture()">
+    <mat-icon>download</mat-icon>
+    <span>Download Original Capture</span>
+  </button>
+  <mat-divider *ngIf="exportObjects.length"></mat-divider>
+  <button
+    *ngIf="exportObjects.length"
+    mat-menu-item
+    [matMenuTriggerFor]="exportObjectsMenu"
+  >
+    <mat-icon>unarchive</mat-icon>
+    <span>Export Objects</span>
+  </button>
+</mat-menu>
+<mat-menu #exportObjectsMenu="matMenu">
+  <button
+    mat-menu-item
+    *ngFor="let item of exportObjects"
+    (click)="onMenuClick(item.tap, 'Export ' + item.name + ' Objects')"
+  >
+    {{ item.name }}
+  </button>
+</mat-menu>
+
+<mat-menu #analyzeMenu="matMenu">
+  <button mat-menu-item (click)="onMenuClick('follow', 'Follow Stream')">Follow Stream</button>
+  <button mat-menu-item (click)="onMenuClick('expert', 'Expert Information')">Expert Information</button>
+</mat-menu>
+
+<mat-menu #statisticsMenu="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="convsMenu">Conversations</button>
+  <button mat-menu-item [matMenuTriggerFor]="endptsMenu">Endpoints</button>
+  <button mat-menu-item (click)="onMenuClick('iograph', 'I/O Graph')">I/O Graph</button>
+  <button mat-menu-item (click)="onMenuClick('flow', 'Flow Graph')">Flow Graph</button>
+</mat-menu>
+<mat-menu #convsMenu="matMenu">
+  <button
+    mat-menu-item
+    *ngFor="let item of convs"
+    (click)="onMenuClick(item.tap, item.name + ' Conversations')"
+  >
+    {{ item.name }}
+  </button>
+</mat-menu>
+<mat-menu #endptsMenu="matMenu">
+  <button
+    mat-menu-item
+    *ngFor="let item of endpts"
+    (click)="onMenuClick(item.tap, item.name + ' Endpoints')"
+  >
+    {{ item.name }}
+  </button>
+</mat-menu>
+
+<mat-menu #telephonyMenu="matMenu">
+  <button mat-menu-item (click)="onMenuClick('voip-calls', 'VoIP Calls')">VoIP Calls</button>
+  <button mat-menu-item (click)="onMenuClick('rtp-streams', 'RTP Streams')">RTP Streams</button>
+</mat-menu>

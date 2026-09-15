@@ -1,0 +1,197 @@
+<isData class="is-data-wrapper" [noDataIf]="streams.length === 0">
+  <div class="rtp-layout" [class.is-analyse]="analyses.length">
+    <div class="rtp-toolbar">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        [disabled]="busy || selectedCount === 0"
+        (click)="playSelected()"
+      >
+        <mat-icon>playlist_play</mat-icon>
+        Play Streams ({{ selectedCount }})
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="busy || !streams.length"
+        (click)="findReverse()"
+      >
+        Find Reverse
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="busy || !streams.length"
+        (click)="analyzeSelected()"
+      >
+        Analyze
+      </button>
+      <span class="busy" *ngIf="busy">{{ progressMessage[progressMessage.length - 1] }}</span>
+      <span class="error" *ngIf="!busy && errorMessage">{{ errorMessage }}</span>
+      <span class="note" *ngIf="!busy && !analyses.length && analyzeNote">{{ analyzeNote }}</span>
+    </div>
+
+    <div class="rtp-player" *ngIf="players.length">
+      <div class="rtp-player-controls">
+        <button
+          mat-mini-fab
+          color="primary"
+          type="button"
+          aria-label="play/stop"
+          (click)="playPauseAll()"
+        >
+          <mat-icon>{{ anyPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+        </button>
+        <span>{{ currentTime | number: '1.2-2' }}s / {{ duration | number: '1.2-2' }}s</span>
+        <span class="note">aligned to earliest start</span>
+      </div>
+      <div class="rtp-waves">
+        <div class="rtp-wave" *ngFor="let rec of players; let i = index">
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="remove stream"
+            (click)="removePlayer(rec.token)"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <rtp-waveform
+            [url]="rec.mp3"
+            [label]="rec.label"
+            [color]="waveColor(i)"
+            (ready)="onWaveReady(rec, $event)"
+          ></rtp-waveform>
+        </div>
+      </div>
+    </div>
+
+    <div class="rtp-analyse" *ngIf="activeAnalysis as a">
+      <div class="rtp-analyse-head">
+        <strong>RTP Stream Analysis</strong>
+        <div class="rtp-switch">
+          <button
+            type="button"
+            *ngFor="let item of analyses; let i = index"
+            [class.active]="analyseTab === i"
+            (click)="setAnalyseTab(i)"
+          >{{ item.tab }}</button>
+        </div>
+        <span class="spacer"></span>
+        <button mat-icon-button type="button" aria-label="close analysis" (click)="closeAnalyse()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="rtp-identity">
+        <span class="ssrc">{{ a.ssrc }}</span>
+        <span class="path">{{ a.src }} → {{ a.dst }}</span>
+        <span class="codec" *ngIf="a.payload">{{ a.payload }}</span>
+      </div>
+
+      <div class="rtp-stats">
+        <span><b>{{ a.stats.packets }}</b> / {{ a.stats.expected }} pkts</span>
+        <span><b>{{ a.stats.lost }}</b> lost</span>
+        <span><b>{{ a.stats.seqErrs }}</b> seq err</span>
+        <span>max Δ <b>{{ a.stats.maxDelta | number: '1.1-1' }}</b> ms</span>
+        <span>max jitter <b>{{ a.stats.maxJitter | number: '1.2-2' }}</b> ms</span>
+        <span>mean jitter <b>{{ a.stats.meanJitter | number: '1.2-2' }}</b> ms</span>
+        <span>max skew <b>{{ a.stats.maxSkew | number: '1.1-1' }}</b> ms</span>
+        <span>duration <b>{{ a.stats.duration | number: '1.2-2' }}</b> s</span>
+      </div>
+
+      <div class="rtp-spark" *ngIf="a.items.length">
+        <svg viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true">
+          <polyline class="delta" [attr.points]="sparkPoints(a.items, 'd')" fill="none" />
+          <polyline class="jitter" [attr.points]="sparkPoints(a.items, 'j')" fill="none" />
+        </svg>
+        <span class="legend"><i class="delta"></i> Delta</span>
+        <span class="legend"><i class="jitter"></i> Jitter</span>
+      </div>
+
+      <div class="rtp-analyse-table-wrap">
+        <table class="rtp-table rtp-analyse-table">
+          <thead>
+            <tr>
+              <th>Packet</th>
+              <th>Seq</th>
+              <th>Time</th>
+              <th>Delta</th>
+              <th>Jitter</th>
+              <th>Skew</th>
+              <th>BW</th>
+              <th>Mark</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let item of a.items"
+              [class.active]="selectedPacket === item.f"
+              (click)="onAnalysePacket(item)"
+            >
+              <td>{{ item.f }}</td>
+              <td>{{ item.sn }}</td>
+              <td>{{ relTime(item, a.t0) }}</td>
+              <td>{{ item.d | number: '1.2-2' }}</td>
+              <td>{{ item.j | number: '1.2-2' }}</td>
+              <td>{{ item.sk | number: '1.2-2' }}</td>
+              <td>{{ formatBw(item) }}</td>
+              <td>{{ item.mark ? 'SET' : '' }}</td>
+              <td [class.warn]="statusWarn(item.s)">{{ item.s }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rtp-table-wrap">
+      <table class="rtp-table" *ngIf="isReady">
+        <thead>
+          <tr>
+            <th class="check"></th>
+            <th>Start</th>
+            <th>Source</th>
+            <th>Port</th>
+            <th>Destination</th>
+            <th>Port</th>
+            <th>SSRC</th>
+            <th>Codec</th>
+            <th>Packets</th>
+            <th>Lost</th>
+            <th>Max Δ</th>
+            <th>Max Jit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of streams"
+            (click)="rowClick({ row: item })"
+            [class.active]="activeToken === streamToken(item)"
+            [class.checked]="item.__selected"
+          >
+            <td class="check" (click)="$event.stopPropagation()">
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="item.__selected"
+                (click)="$event.stopPropagation()"
+                (ngModelChange)="onCheck()"
+              ></mat-checkbox>
+            </td>
+            <td>{{ formatTime(item.start) }}</td>
+            <td>{{ item.saddr }}</td>
+            <td>{{ item.sport }}</td>
+            <td>{{ item.daddr }}</td>
+            <td>{{ item.dport }}</td>
+            <td>{{ item.ssrc }}</td>
+            <td>{{ item.payload }}</td>
+            <td>{{ item.pkts }}</td>
+            <td>{{ item.lost || 0 }}</td>
+            <td>{{ item.max_delta | number: '1.1-1' }}</td>
+            <td>{{ item.max_jitter | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</isData>

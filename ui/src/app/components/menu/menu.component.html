@@ -1,0 +1,11 @@
+<isData [noDataIf]="!menuTree?.length"
+  [inProgress]="!menuTree">
+  <tree-filter [data]="menuTree"
+    defaultFilterValue="Ethernet||IP||Flow||RTP||VoIP||SIP||HTTP"
+    [noPadding]="true"
+    [isFilterLine]="true"
+    [isFilter]="false"
+    [fileIcon]="false"
+    (clickRow)="onSelected($event)"
+    ></tree-filter>
+</isData>

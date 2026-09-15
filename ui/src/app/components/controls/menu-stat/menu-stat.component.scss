@@ -1,0 +1,12 @@
+.menu-stat {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-height: 2rem;
+}
+.menu-stat button {
+  min-width: auto;
+  line-height: 2rem;
+  height: 2rem;
+  font-size: 13px;
+}
