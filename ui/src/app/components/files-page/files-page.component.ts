@@ -39,7 +39,7 @@ export class FilesPageComponent implements OnInit {
     const mapping = (file: any, prefix: string = '/') => {
       if (file.dir === true) {
         const o: any = {
-          name: file.name + ` <i></i>[..loading]</i>`,
+          name: file.name + ' [..loading]',
           description: prefix,
           children: []
         }

@@ -1,4 +1,5 @@
 import { Functions } from '@app/helper/functions';
+import { escapeHtml, highlightFilteredHtml } from '@app/helper/safe-html';
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, EventEmitter, Output, AfterViewInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
@@ -48,14 +49,14 @@ export class TreeFilterComponent implements OnInit, AfterViewInit {
       return Object.entries(data).map(([key, value]: any): TreeNode => {
         if (typeof value !== 'object') {
           return {
-            name: `${key}: ${value}`,
+            name: `${escapeHtml(key)}: ${escapeHtml(value)}`,
             description: key
           }
         }
         const o = convertObjectToTreeData(value);
         const _length = Object.keys(value).length;
         return {
-          name: `${key}: <i style="color: #999;">[${_length}] ${JSON.stringify(value)}</i>`,
+          name: `${escapeHtml(key)}: [${_length}] ${escapeHtml(JSON.stringify(value))}`,
           description: key,
           children: o
         }
@@ -134,18 +135,7 @@ export class TreeFilterComponent implements OnInit, AfterViewInit {
     };
   }
   highlight(text: any, isRedial = false) {
-    if (this.textFilterTree === '') {
-      return text;
-    }
-    const arr = this.textFilterTree.split('||');
-    let outText = text;
-    arr.forEach((f, key) => {
-      const color = ['yellow', '#ffcaca', '#b7f875', '#86f2fb', '#DD99FF', '#eea371'][key % 6];
-      const redial = isRedial ? 'border-radius: 4px;' : 'color: black; border-radius: 2px;';
-      const tag = `<span style="background-color: ${color};${redial}">${f}</span>`;
-      outText = f !== '' && outText.includes(f) ? outText.replaceAll(f, tag) : outText;
-    })
-    return outText;
+    return highlightFilteredHtml(text, this.textFilterTree, isRedial);
   }
   isSelectedHexArray({ description }: any) {
     return this.selectedHexArray.map((i: any) => i.description).includes(description);
