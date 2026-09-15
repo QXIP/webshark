@@ -68,11 +68,7 @@ npm --prefix ui start -- --configuration static   # local preview
 
 Pushing to `main`/`master` publishes that build to GitHub Pages (`.github/workflows/github-pages.yml`). Enable **Settings → Pages → Source: GitHub Actions** once. The base href is `/<repo>/` (or `/` for `user.github.io` repos).
 
-RTP playback needs SharedArrayBuffer (cross-origin isolation):
-
-- **`http://localhost` / `127.0.0.1`**: `ng serve` and Fastify send COOP/COEP, so FFmpeg can load. Restart the dev server after pulling this change.
-- **GitHub Pages (HTTPS)**: `enable-threads.js` registers a service worker that adds the same headers. Reload once after the worker installs.
-- **HTTP on a LAN hostname** cannot isolate; browsers hide `SharedArrayBuffer`. Use localhost or HTTPS.
+RTP playback uses FFmpeg.wasm and needs a cross-origin isolated HTTPS origin (GitHub Pages + `enable-threads.js`). Local HTTP will not play audio.
 
 ## Embed / iframe
 

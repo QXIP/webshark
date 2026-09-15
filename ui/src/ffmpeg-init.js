@@ -1,7 +1,7 @@
-if (!self.crossOriginIsolated) {
-  console.log('ffmpeg: SharedArrayBuffer unavailable (needs HTTPS or localhost COOP/COEP). RTP playback may be limited.');
-} else {
+if (self.crossOriginIsolated) {
   console.log('ffmpeg::Ready!');
+} else {
+  console.log('ffmpeg: not cross-origin isolated; RTP playback needs HTTPS (GitHub Pages).');
 }
 
 const { createFFmpeg, fetchFile } = FFmpeg;
@@ -93,12 +93,12 @@ const defaults = {
 const transcode = async (blobData, codec, output) => {
   const inputName = "rtp-payload.bin";
   const outputName = output || "audio.mp3";
-    if (!ffmpeg.isLoaded()) {
-      if (typeof SharedArrayBuffer === "undefined") {
-        throw new Error("SharedArrayBuffer is unavailable. Serve over HTTPS or http://localhost with COOP/COEP.");
-      }
-      await ffmpeg.load();
-    }
+  if (!self.crossOriginIsolated) {
+    throw new Error("RTP playback needs HTTPS (GitHub Pages). This origin is not cross-origin isolated.");
+  }
+  if (!ffmpeg.isLoaded()) {
+    await ffmpeg.load();
+  }
 
   const rate = codec === "g722" ? "16000" : "8000";
   const wavName = String(outputName).replace(/\.[^.]+$/, "") + ".wav";
