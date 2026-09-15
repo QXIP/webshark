@@ -4,6 +4,7 @@ const JSONStream = require('JSONStream');
 const fs = require('fs');
 
 const SHARKD_SOCKET = process.env.SHARKD_SOCKET || "/var/run/sharkd.sock";
+const SHARKD_BINARY = process.env.SHARKD_BINARY || "sharkd";
 
 // Make sure CAPTURES_PATH has a trailing /
 let _captures_path = process.env.CAPTURES_PATH || "/captures/";
@@ -69,24 +70,36 @@ get_sharkd_cli = async function(capture) {
     catch(err) {
       console.log("Error trying to connect to " + SHARKD_SOCKET)
       console.log(err);
-      if (sharkd_proc !== null && sharkd_proc.pid) {
-        console.log("sharkd_proc.pid: " + sharkd_proc.pid)
-        sharkd_proc.kill('SIGHUP');
-        await sleep(250);
+
+      // Only kill and respawn if sharkd has already exited — don't kill a
+      // still-running process that is just slow to create its socket.
+      const sharkdExited = sharkd_proc !== null && sharkd_proc.exitCode !== null;
+      if (sharkdExited) {
+        console.log("sharkd_proc.pid: " + sharkd_proc.pid + " exited, restarting");
         sharkd_proc = null;
       }
-      try {
-        console.log(`Trying to spawn unix:${SHARKD_SOCKET}`)
-        sharkd_proc = spawn('sharkd', ['unix:' + SHARKD_SOCKET]);
-        await sleep(250);
-        if (sharkd_proc.exitCode === 1) {
-          console.log(`Error spawning sharkd under ${SHARKD_SOCKET} / exit 1`);
-          process.exit(1);
+
+      if (sharkd_proc === null) {
+        try {
+          // Wireshark 4.x requires the -a flag to start sharkd in server/daemon
+          // mode.  Without it the positional argument is treated as a client
+          // connection URL, sharkd finds nothing to connect to, and exits
+          // immediately with code 0.
+          console.log(`Trying to spawn ${SHARKD_BINARY} -a unix:${SHARKD_SOCKET}`)
+          sharkd_proc = spawn(SHARKD_BINARY, ['-a', 'unix:' + SHARKD_SOCKET]);
+        } catch (err_2) {
+          console.log(`Error spawning sharkd: ${err_2.message}`);
+          sharkd_proc = null;
+          return null;
         }
-      } catch (err_2) {
-        console.log(`Error spawning sharkd under ${SHARKD_SOCKET} / err_2`);
-        console.log(err_2);
-        process.exit(1);
+      }
+
+      // Give sharkd enough time to create the socket before retrying.
+      await sleep(1000);
+      if (sharkd_proc.exitCode !== null) {
+        console.log(`sharkd exited with code ${sharkd_proc.exitCode} — check SHARKD_BINARY (${SHARKD_BINARY})`);
+        sharkd_proc = null;
+        return null;
       }
       return get_sharkd_cli(capture);
     }

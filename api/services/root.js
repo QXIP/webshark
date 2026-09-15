@@ -51,7 +51,7 @@ module.exports = async function (fastify) {
       } catch (_) {}
 
       for (const pcap_file of files) {
-        if (!pcap_file.endsWith('.pcap')) {
+        if (!pcap_file.endsWith('.pcap') && !pcap_file.endsWith('.cap')) {
           continue
         }
         // Skip path traversal / odd names

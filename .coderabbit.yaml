@@ -1,0 +1,82 @@
+language: "en-US"
+
+reviews:
+  # Always request a full review, not just the diff
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  # Focus areas for this security assessment
+  path_instructions:
+    - path: "api/**"
+      instructions: |
+        This is a Node.js/Fastify backend. Focus on:
+        - OWASP Top 10: injection, broken access control, insecure design, security misconfiguration
+        - Path traversal in all fs.* calls (check that `..` and URL-encoded variants are blocked)
+        - All user-supplied input flowing into sharkd socket writes — look for protocol injection
+        - Rate limiting: verify every public route has @fastify/rate-limit applied
+        - The readAndParseSocket function in sharkd_dict.js: check for event listener leaks (on('data') never removed)
+        - Recursive get_sharkd_cli calls: check for missing depth limit (infinite recursion risk)
+        - process.exit() usage: flag any instance that would crash the server on a request error
+        - Unauthenticated endpoints: document every route that has no auth check
+
+    - path: "api/services/upload.js"
+      instructions: |
+        File upload handler. Check:
+        - MIME type is not validated — any file type can be uploaded, not just PCAP
+        - MAX_FILE_SIZE defaults to Infinity if UPLOAD_MAX_BYTES env is unset — flag this
+        - safeCaptureName uses path.basename which is correct, but verify null-byte and unicode edge cases
+        - Uploaded files are written to CAPTURES_PATH which is also served as static files — verify no HTML/JS uploads possible that would be served back (stored XSS via PCAP-named .html)
+
+    - path: "api/services/stenographer.js"
+      instructions: |
+        SSRF bridge to an external Stenographer service. Check:
+        - STENOGRAPHER_URL is trusted from env but verify the query param is fully URL-encoded before use
+        - The response from Stenographer is written directly to disk without MIME/magic-byte validation
+        - No check that the returned bytes are actually a valid PCAP file
+        - Check for SSRF: can the query param be used to redirect the Stenographer URL?
+
+    - path: "Dockerfile"
+      instructions: |
+        Multi-stage Docker build. Check:
+        - Base image pinning: node:20-bookworm-slim and node:20-bookworm use floating tags, not digest pins
+        - Wireshark and webshark-ui are cloned from git with --branch tag but no checksum/signature verification (supply chain risk)
+        - Final image runs as 'node' user (good), but verify no SUID/SGID binaries are copied in
+        - apt-get installs: check for unnecessary packages that increase attack surface
+        - No HEALTHCHECK instruction defined
+        - ENTRYPOINT uses su — verify it cannot be bypassed
+
+    - path: "entrypoint.sh"
+      instructions: |
+        Container entrypoint. Check:
+        - `su node -c "npm start"` runs in restricted PATH — verify SHARKD_BINARY is set to full path
+        - rm -f on SHARKD_SOCKET: verify no TOCTOU race between socket removal and sharkd start
+        - chown logic: verify it cannot be tricked into chowning an unexpected path if CAPTURES_PATH contains special chars
+
+    - path: "sharkd/build.sh"
+      instructions: |
+        Build script for sharkd (Wireshark). Check:
+        - SHARKD_BUILD_JOBS is interpolated into make -j"$JOBS" — verify it cannot inject make flags if set to a malicious value
+        - cmake flags: verify ENABLE_STATIC=ON and ENABLE_PLUGINS=OFF reduce attack surface appropriately
+        - No integrity check on the cloned Wireshark source
+
+    - path: ".github/workflows/**"
+      instructions: |
+        CI/CD pipeline. Check:
+        - Secrets in env vars: look for hardcoded tokens or credentials
+        - Third-party GitHub Actions: verify they are pinned to a commit SHA, not a floating tag (supply chain attack surface)
+        - Permissions: check if the workflow has write access to the repo or packages unnecessarily
+        - Injection via github.event inputs into shell commands
+
+  tools:
+    github-checks:
+      enabled: true
+    shellcheck:
+      enabled: true
+    hadolint:
+      enabled: true
+
+chat:
+  auto_reply: true

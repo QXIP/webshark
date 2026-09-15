@@ -38,6 +38,7 @@ RUN chmod +x /usr/src/vendor-offline-fonts.sh \
  && git clone --depth 1 --branch "${WEBSHARK_UI_REF}" https://github.com/QXIP/webshark-ui.git /usr/src/webshark-ui \
  && cd /usr/src/webshark-ui \
  && npm ci \
+ && sed -i 's/"maximumError": "10mb"/"maximumError": "20mb"/g' /usr/src/webshark-ui/angular.json \
  && if [ "${WEBSHARK_UI_MODE}" = "kiosk" ]; then npm run build:kiosk; else npm run build; fi \
  && mkdir -p /usr/src/web \
  && cp -a dist/webshark/. /usr/src/web/ \
@@ -49,6 +50,7 @@ FROM node:20-bookworm-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libglib2.0-0 speex libspeex1 libspeexdsp1 libc-ares2 libxml2 \
+        libbrotli1 libkrb5-3 libk5crypto3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /captures /usr/local/bin /usr/local/share/wireshark/ \
@@ -59,6 +61,7 @@ COPY --from=intermediate /usr/src/wireshark/build/run/colorfilters /usr/local/sh
 
 ENV CAPTURES_PATH=/captures/
 ENV SHARKD_SOCKET=/captures/sharkd.sock
+ENV SHARKD_BINARY=/usr/local/bin/sharkd
 
 COPY --chown=node . /usr/src/node-webshark
 COPY --from=intermediate /usr/src/web /usr/src/node-webshark/web

@@ -1,0 +1,6 @@
+projectKey=qxip-webshark
+serverUrl=https://sonarqube.corp.redhat.com
+serverVersion=2026.3.1.123439
+dashboardUrl=https://sonarqube.corp.redhat.com/dashboard?id=qxip-webshark
+ceTaskId=95078e30-eaa1-4083-a9ff-5e5e8405326f
+ceTaskUrl=https://sonarqube.corp.redhat.com/api/ce/task?id=95078e30-eaa1-4083-a9ff-5e5e8405326f

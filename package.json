@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@sonar/scan": "^5.0.0",
+    "adm-zip": "^0.6.1"
+  }
+}
