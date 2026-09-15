@@ -21,8 +21,8 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
+  background: var(--ws-surface);
+  border-bottom: 1px solid var(--ws-border-strong);
   font-weight: 600;
 }
 .seq-time {
@@ -30,7 +30,7 @@
   padding: 0.2rem 0.4rem;
   display: flex;
   align-items: center;
-  background: #eee;
+  background: var(--ws-bg-muted);
   font-variant-numeric: tabular-nums;
   font-size: 11px;
 }
@@ -48,7 +48,7 @@
   padding: 0.2rem;
 }
 .seq-host {
-  border-bottom: 1px solid #999;
+  border-bottom: 1px solid var(--ws-border-strong);
 }
 .seq-lane {
   position: relative;
@@ -59,11 +59,11 @@
   bottom: 0;
   left: 50%;
   width: 0;
-  border-left: 1px dashed #bbb;
+  border-left: 1px dashed var(--ws-border-strong);
 }
 .seq-row {
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--ws-border);
   &:hover {
     background: rgba(63, 81, 181, 0.06);
   }
@@ -86,7 +86,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 0.8em;
-    color: #222;
+    color: var(--ws-text);
     padding: 0 0.25rem;
   }
 }

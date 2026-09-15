@@ -2,15 +2,16 @@
 
 # webshark-ng
 
-**webShark** is a Wireshark-like web app. Packet dissection runs **in the browser** with [Wiregasm](https://github.com/goodstemy/wiregasm) (`@goodtools/wiregasm` 1.9.1, Wireshark 4.4.5 WASM). Fastify is only the origin plus optional PCAP storage.
+**webShark** v3.0.0 brings PCAP dissection **into your browser** _(Wireshark 4.4.5 WASM)_ 
 
 <img src="https://github.com/QXIP/webshark/assets/1423657/092c2544-f5db-4a79-b3da-d48df4e0813c" width=600 />
 
-> RTP playback uses ffmpeg WASM. That needs SharedArrayBuffer (localhost or HTTPS with COOP/COEP).
+### Features in v3.0.0
 
-Accepts `.pcapng`, `.pcap`, and `.cap`.
-
-LAN/kiosk deployments stay unauthenticated in v1. Treat `/captures` as trusted local files; do not expose the API to the public internet without a reverse-proxy auth layer.
+- Baseline Wireshark UI/UX
+- No sharkd or backend needed 
+- 100% WASM packet dissection
+- Load/Save PCAP/PCAPNG/CAP 
 
 ## Architecture
 
@@ -67,7 +68,11 @@ npm --prefix ui start -- --configuration static   # local preview
 
 Pushing to `main`/`master` publishes that build to GitHub Pages (`.github/workflows/github-pages.yml`). Enable **Settings → Pages → Source: GitHub Actions** once. The base href is `/<repo>/` (or `/` for `user.github.io` repos).
 
-RTP playback still needs SharedArrayBuffer (HTTPS + the bundled COOP/COEP service worker).
+RTP playback needs SharedArrayBuffer (cross-origin isolation):
+
+- **`http://localhost` / `127.0.0.1`**: `ng serve` and Fastify send COOP/COEP, so FFmpeg can load. Restart the dev server after pulling this change.
+- **GitHub Pages (HTTPS)**: `enable-threads.js` registers a service worker that adds the same headers. Reload once after the worker installs.
+- **HTTP on a LAN hostname** cannot isolate; browsers hide `SharedArrayBuffer`. Use localhost or HTTPS.
 
 ## Embed / iframe
 

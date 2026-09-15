@@ -6,8 +6,11 @@ import {
   padRtpAudio,
   parseCapturePackets,
   parseCapturePacketsTimed,
+  rtpAudioFromDump,
+  rtpEndpointsMatch,
   rtpPacketsForStream,
   rtpPayloadForStream,
+  rtpPayloadFromTree,
   rtpPayloadFromUdp,
   rtpPayloadsBySsrc,
   sessionStartForClips,
@@ -229,5 +232,35 @@ describe('rtp-extract', () => {
     } finally {
       (globalThis as any).transcode = prev;
     }
+  });
+
+  it('does not insert comfort bytes into a G.729 bitstream', () => {
+    const stitched = stitchRtpPayloads([
+      { ts: 1, payload: u8(0x11, 0x22) },
+      { ts: 2, payload: u8(0x33, 0x44) }
+    ], 'g729');
+    expect(Array.from(stitched!.bytes)).toEqual([0x11, 0x22, 0x33, 0x44]);
+    expect(padRtpAudio(stitched!, 0, 'g729')).toEqual(stitched!.bytes);
+  });
+
+  it('extracts RTP payload from dissected tree offsets', () => {
+    const bytes = u8(0, 1, 2, 3, 0xaa, 0xbb, 0xcc, 9);
+    const payload = rtpPayloadFromTree([{ f: 'rtp.payload', h: [4, 3] }], bytes);
+    expect(Array.from(payload!)).toEqual([0xaa, 0xbb, 0xcc]);
+  });
+
+  it('builds audio from a WASM rtpDump using tree payload when frame parse fails', () => {
+    const clip = rtpAudioFromDump([
+      { t: 1, payload: u8(0x11, 0x22), ssrc: 'd2bd4e3e', saddr: '200.57.7.204', sport: 8000, daddr: '200.57.7.196', dport: 40376 },
+      { t: 1.02, payload: u8(0x33), ssrc: 'd2bd4e3e', saddr: '200.57.7.204', sport: 8000, daddr: '200.57.7.196', dport: 40376 }
+    ], { saddr: '200.57.7.204', sport: 8000, daddr: '200.57.7.196', dport: 40376, ssrc: '0xD2BD4E3E' }, 'g729');
+    expect(Array.from(clip!.bytes)).toEqual([0x11, 0x22, 0x33]);
+  });
+
+  it('matches RTP endpoints by SSRC and ports without requiring a token string', () => {
+    expect(rtpEndpointsMatch(
+      { saddr: '10.0.2.15', sport: 28120, daddr: '10.0.2.20', dport: 6000, ssrc: '44559a1' },
+      { saddr: '10.0.2.15', sport: 28120, daddr: '10.0.2.20', dport: 6000, ssrc: '0x44559A1' }
+    )).toBeTrue();
   });
 });

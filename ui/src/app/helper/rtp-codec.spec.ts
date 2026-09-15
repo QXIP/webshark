@@ -1,4 +1,4 @@
-import { ffmpegCodecForPayload, ffmpegSampleRate, rtpBytesPerSecond, rtpSilenceByte } from './rtp-codec';
+import { codecAllowsBitstreamPad, ffmpegCodecForPayload, ffmpegSampleRate, rtpBytesPerSecond, rtpSilenceByte } from './rtp-codec';
 
 describe('ffmpegCodecForPayload', () => {
   it('maps PCMA / G.711A to alaw', () => {
@@ -12,9 +12,19 @@ describe('ffmpegCodecForPayload', () => {
     expect(ffmpegCodecForPayload('g711u')).toBe('mulaw');
   });
 
-  it('maps G.722 and unknown payloads to g722', () => {
+  it('maps G.722 by name and G.729 instead of defaulting to G.722', () => {
     expect(ffmpegCodecForPayload('g722')).toBe('g722');
-    expect(ffmpegCodecForPayload('unknown')).toBe('g722');
+    expect(ffmpegCodecForPayload('ITU-T G.729')).toBe('g729');
+    expect(ffmpegCodecForPayload('unknown')).toBe('alaw');
+  });
+
+  it('maps static payload types', () => {
+    expect(ffmpegCodecForPayload('', 0)).toBe('mulaw');
+    expect(ffmpegCodecForPayload('', 8)).toBe('alaw');
+    expect(ffmpegCodecForPayload('', 9)).toBe('g722');
+    expect(ffmpegCodecForPayload('', 18)).toBe('g729');
+    expect(ffmpegCodecForPayload('18')).toBe('g729');
+    expect(ffmpegCodecForPayload('telephone-event', 101)).toBe('');
   });
 
   it('uses 8 kHz for G.711 and 16 kHz for G.722', () => {
@@ -26,6 +36,9 @@ describe('ffmpegCodecForPayload', () => {
   it('uses encoded byte rate for silence padding', () => {
     expect(rtpBytesPerSecond('alaw')).toBe(8000);
     expect(rtpBytesPerSecond('g722')).toBe(8000);
+    expect(rtpBytesPerSecond('g729')).toBe(1000);
+    expect(codecAllowsBitstreamPad('alaw')).toBeTrue();
+    expect(codecAllowsBitstreamPad('g729')).toBeFalse();
   });
 
   it('uses codec-typical silence bytes', () => {

@@ -76,3 +76,7 @@ export function sharkdErrorMessage(data: any): string {
     || data.message
     || 'Failed to load capture';
 }
+
+export function asFileList(value: unknown): any[] {
+  return Array.isArray(value) ? value : [];
+}

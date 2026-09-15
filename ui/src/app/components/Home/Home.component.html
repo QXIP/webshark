@@ -22,11 +22,30 @@
         [data]="chartSeries"
         #headerChart
       ></flexible-chart>
+      <button
+        mat-icon-button
+        *ngIf="!isEmbed"
+        [matTooltip]="theme.tooltip"
+        (click)="theme.cycle()"
+      >
+        <mat-icon>{{ theme.icon }}</mat-icon>
+      </button>
       <button mat-icon-button [matMenuTriggerFor]="menuSettings" *ngIf="!isEmbed">
         <mat-icon>settings</mat-icon>
         <mat-menu #menuSettings="matMenu">
           <div>
-
+            <div class="theme-menu" (click)="$event.stopPropagation()">
+              <div class="theme-menu-label">Appearance</div>
+              <mat-radio-group
+                class="theme-menu-options"
+                [value]="theme.mode"
+                (change)="theme.setMode($event.value)"
+              >
+                <mat-radio-button color="primary" value="auto">Auto</mat-radio-button>
+                <mat-radio-button color="primary" value="light">Light</mat-radio-button>
+                <mat-radio-button color="primary" value="dark">Dark</mat-radio-button>
+              </mat-radio-group>
+            </div>
             <div style="padding: 1rem; display: flex">
               <mat-radio-group aria-label="Chart settings">
                 <mat-radio-button

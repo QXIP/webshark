@@ -6,8 +6,8 @@
 .grid-content {
   padding: 2px;
   // margin: 2px;
-  background-color: white;
-  border: 1px solid #999;
+  background-color: var(--ws-surface);
+  border: 1px solid var(--ws-border-strong);
 }
 
 .body-container {
@@ -56,5 +56,19 @@
 .example-sidenav {
   padding: 0rem;
   min-width: 10rem;
+}
+
+.theme-menu {
+  padding: 0.75rem 1rem 0;
+}
+.theme-menu-label {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-bottom: 0.35rem;
+}
+.theme-menu-options {
+  display: flex;
+  gap: 0.75rem;
 }
 

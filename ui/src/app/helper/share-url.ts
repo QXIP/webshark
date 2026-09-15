@@ -85,7 +85,7 @@ export function rtpStreamToken(rtp: { saddr: string; sport: number; daddr: strin
   const ssrc = typeof rtp.ssrc === 'number'
     ? rtp.ssrc.toString(16)
     : String(rtp.ssrc).replace(/^0x/i, '');
-  return [rtp.saddr, rtp.sport, rtp.daddr, rtp.dport, ssrc].join('_');
+  return [rtp.saddr, rtp.sport, rtp.daddr, rtp.dport, ssrc.toLowerCase()].join('_');
 }
 
 export function iframeEmbedSnippet(origin: string, state: WebsharkViewState): string {

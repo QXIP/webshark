@@ -1,4 +1,4 @@
-$bgColor: rgba(black, 0.12);
+$bgColor: var(--ws-hover);
 
 :host {
   display: flex;
@@ -36,17 +36,17 @@ table.this-table {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-bottom: 1px solid rgb(0 0 0 / 20%);
+    border-bottom: 1px solid var(--ws-border);
   }
 }
 
 .mat-row {
   &:nth-child(2n+1) {
-    background-color: #e4f0ec;
+    background-color: var(--ws-row-odd);
   }
 
   &:not(:nth-child(2n+1)) {
-    background-color: #ffffff;
+    background-color: var(--ws-row-even);
   }
 }
 

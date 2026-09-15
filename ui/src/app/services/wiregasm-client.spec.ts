@@ -22,5 +22,9 @@ describe('WiregasmClient', () => {
     expect(backend.call).toHaveBeenCalledWith('load', jasmine.objectContaining({ name: 'a.pcap' }));
     await client.load('b.pcap', { url: '/webshark/captures/b.pcap' });
     expect(backend.call).toHaveBeenCalledWith('load', { name: 'b.pcap', url: '/webshark/captures/b.pcap' });
+    await client.readCapture();
+    expect(backend.call).toHaveBeenCalledWith('readCapture', undefined);
+    await client.rtpDump({ ssrc: '0xd2bd4e3e', saddr: '10.0.0.1', sport: 8000, daddr: '10.0.0.2', dport: 9000 });
+    expect(backend.call).toHaveBeenCalledWith('rtpDump', jasmine.objectContaining({ ssrc: 'd2bd4e3e' }));
   });
 });

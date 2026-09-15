@@ -93,37 +93,45 @@ const defaults = {
 const transcode = async (blobData, codec, output) => {
   const inputName = "rtp-payload.bin";
   const outputName = output || "audio.mp3";
-  try {
     if (!ffmpeg.isLoaded()) {
+      if (typeof SharedArrayBuffer === "undefined") {
+        throw new Error("SharedArrayBuffer is unavailable. Serve over HTTPS or http://localhost with COOP/COEP.");
+      }
       await ffmpeg.load();
     }
 
-    const rate = codec === "g722" ? "16000" : "8000";
-    const wavName = String(outputName).replace(/\.[^.]+$/, "") + ".wav";
-    console.log("Start transcoding", codec, wavName, rate);
-    try { ffmpeg.FS("unlink", inputName); } catch (e) {}
-    try { ffmpeg.FS("unlink", wavName); } catch (e) {}
-    ffmpeg.FS("writeFile", inputName, await fetchFile(blobData));
-    const command = [
-      "-f", codec || "g722",
-      "-ar", rate,
-      "-ac", "1",
-      "-i", inputName,
-      "-f", "wav",
-      "-acodec", "pcm_s16le",
-      "-ar", rate,
-      "-ac", "1",
-      wavName,
-    ];
+  const rate = codec === "g722" ? "16000" : "8000";
+  const wavName = String(outputName).replace(/\.[^.]+$/, "") + ".wav";
+  console.log("Start transcoding", codec, wavName, rate);
+  try { ffmpeg.FS("unlink", inputName); } catch (e) {}
+  try { ffmpeg.FS("unlink", wavName); } catch (e) {}
+  ffmpeg.FS("writeFile", inputName, await fetchFile(blobData));
+  const command = [
+    "-f", codec || "alaw",
+    "-ar", rate,
+    "-ac", "1",
+    "-i", inputName,
+    "-f", "wav",
+    "-acodec", "pcm_s16le",
+    "-ar", rate,
+    "-ac", "1",
+    wavName,
+  ];
 
-    await ffmpeg.run(...command);
-    console.log("Complete transcoding");
-    const data = ffmpeg.FS("readFile", wavName);
-    try { ffmpeg.FS("unlink", inputName); } catch (e) {}
-    try { ffmpeg.FS("unlink", wavName); } catch (e) {}
-    return URL.createObjectURL(new Blob([data.buffer], { type: "audio/wav" }));
+  await ffmpeg.run(...command);
+  console.log("Complete transcoding");
+  let data;
+  try {
+    data = ffmpeg.FS("readFile", wavName);
   } catch (e) {
-    console.error("ffmpeg transcode failed", e);
+    throw new Error("ffmpeg produced no WAV for " + codec);
   }
+  try { ffmpeg.FS("unlink", inputName); } catch (e) {}
+  try { ffmpeg.FS("unlink", wavName); } catch (e) {}
+  const pcm = data && (typeof data.slice === "function" ? data.slice() : new Uint8Array(data));
+  if (!pcm || pcm.byteLength < 44) {
+    throw new Error("ffmpeg produced no PCM for " + codec);
+  }
+  return URL.createObjectURL(new Blob([pcm], { type: "audio/wav" }));
 };
 globalThis.transcode = transcode;

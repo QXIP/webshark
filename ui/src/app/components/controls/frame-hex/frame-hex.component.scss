@@ -1,14 +1,15 @@
 :host {
   max-height: 100%;
   overflow: auto;
-  background-color: white;
+  background-color: var(--ws-surface);
+  color: var(--ws-text);
   scroll-behavior: smooth;
 
   .panel {
     position: sticky;
     top: 0px;
-    background-color: white;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    background-color: var(--ws-surface);
+    border-bottom: 2px solid var(--ws-border);
   }
   .col-index {
     padding: 0 4px;
@@ -20,7 +21,7 @@
     font-family: monospace;
     padding: 0 4px;
     &:hover {
-      background-color: #abb3e0;
+      background-color: var(--ws-hex-hover);
     }
 
     &:nth-child(8n+1) {
@@ -30,8 +31,8 @@
   }
 
   .selected {
-    background-color: #3f51b5;
-    color: white;
+    background-color: var(--ws-primary);
+    color: var(--ws-on-primary);
   }
 
   .col-char {

@@ -1,5 +1,7 @@
 import { Component, Input, OnInit, ViewChild, EventEmitter, Output, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { Functions, hash } from '@app/helper/functions';
+import { ThemeService } from '@app/services/theme.service';
+import { Subscription } from 'rxjs';
 
 export interface ChartOptions {
 
@@ -63,8 +65,9 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private checkInterval: any;
   private bufferOffsetChart: any;
+  private themeSub?: Subscription;
 
-  constructor() { }
+  constructor(private theme: ThemeService) { }
 
   @HostListener('window:resize')
   onResize() {
@@ -89,6 +92,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnInit() {
     this.eventCheckerCanvasSizeChanged();
+    this.themeSub = this.theme.resolved$.subscribe(() => this.redraw());
   }
   public mouseEvent(event: any) {
     const { layerX, layerY } = event;
@@ -172,14 +176,14 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     ));
     const y = 10;
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = this.cssVar('--ws-chart-tooltip-bg', 'rgba(255, 255, 255, 0.8)');
+    ctx.fillStyle = this.cssVar('--ws-chart-text', 'black');
     text.split('\n').forEach((line, k) => {
 
       this.drawText(ctx, line, {
         x, y: y + k * 20,
-        bgColor: 'rgba(255, 255, 255, 0.8)',
-        color: 'black'
+        bgColor: this.cssVar('--ws-chart-tooltip-bg', 'rgba(255, 255, 255, 0.8)'),
+        color: this.cssVar('--ws-chart-text', 'black')
       })
     })
 
@@ -210,12 +214,19 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     return out;
   }
   setLineStyle(ctx: any) {
+    const canvas = this.cssVar('--ws-chart-canvas', '#fff');
     ctx.beginPath();
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = canvas;
+    ctx.strokeStyle = canvas;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 1;
+  }
+  private cssVar(name: string, fallback: string): string {
+    if (typeof getComputedStyle !== 'function') {
+      return fallback;
+    }
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
   }
   draw(ctx: any) {
 
@@ -267,7 +278,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     const padding = { x: 10, y: this.options.axisY ? 40 : 0 };
     const h = ctx.canvas.offsetHeight - padding.y;
     this.setLineStyle(ctx);
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = this.cssVar('--ws-chart-text', '#000');
     ctx.moveTo(padding.x, 0);
     ctx.lineTo(padding.x, h);
     ctx.stroke();
@@ -287,7 +298,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
         x: padding.x + 5,
         y: y - 12,
         bgColor: 'rgba(255, 255, 255, 0)',
-        color: 'black'
+        color: this.cssVar('--ws-chart-text', 'black')
       })
     }
 
@@ -298,7 +309,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     const w = ctx.canvas.offsetWidth - padding.x * 2;
     const h = ctx.canvas.offsetHeight;
     this.setLineStyle(ctx);
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = this.cssVar('--ws-chart-text', '#000');
     ctx.moveTo(padding.x, h - padding.y);
     ctx.lineTo(padding.x + w, h - padding.y);
     ctx.stroke();
@@ -318,7 +329,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
         x: x - 10,
         y: y,
         bgColor: 'rgba(255, 255, 255, 0)',
-        color: 'black'
+        color: this.cssVar('--ws-chart-text', 'black')
       })
     }
   }
@@ -334,8 +345,8 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       const startX = Math.max(a, b);
       const endX = Math.min(a, b);
       ctx.fillStyle = 'rgba(128,255,128,0.5)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.fillRect(startX, 0, endX - startX, ctx.canvas.height);
+    ctx.strokeStyle = this.cssVar('--ws-chart-text', 'rgba(255, 255, 255, 0.8)');
+    ctx.fillRect(startX, 0, endX - startX, ctx.canvas.height);
       ctx.stroke();
     }
   }
@@ -402,7 +413,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
   drawTarget(ctx: any) {
     this.setLineStyle(ctx);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.strokeStyle = this.cssVar('--ws-chart-text', 'rgba(255, 255, 255, 0.8)');
 
     // vertical
     ctx.moveTo(this.mousePosition.x, 0);
@@ -431,6 +442,7 @@ export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     // requestAnimationFrame(this.redraw.bind(this));
   }
   ngOnDestroy() {
+    this.themeSub?.unsubscribe();
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
     }

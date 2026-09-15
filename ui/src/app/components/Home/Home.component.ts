@@ -1,5 +1,6 @@
 import { ModalResizableService } from './../controls/modal-resizable/modal-resizable.service';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
+import { ThemeService } from '@app/services/theme.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
@@ -14,7 +15,7 @@ declare const transcode: Function;
 })
 export class HomeComponent implements OnInit {
   typeOfChart: any = 'area';
-  files: any;
+  files: any[] = [];
   isKIOSK = !!environment.kiosk;
   isEmbed = false;
   isClientOnly = !!environment.clientOnly;
@@ -26,13 +27,14 @@ export class HomeComponent implements OnInit {
   constructor(
     private webSharkDataService: WebSharkDataService,
     private modalResizableService: ModalResizableService,
+    public theme: ThemeService,
     private route: ActivatedRoute
   ) {
     const state = parseViewState(location.search);
     this.isEmbed = !!environment.kiosk || !!state.embed || location.pathname.indexOf('/embed') !== -1;
     this.isKIOSK = this.isKIOSK || this.isEmbed;
     this.isFileOnLink = !state.capture;
-    this.files = this.isFileOnLink;
+    this.files = [];
     this.modalResizableService.event.subscribe(({ open, data }) => {
       if (open) {
         this.dialogs.push(data)

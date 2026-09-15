@@ -19,11 +19,11 @@
   font-size: 12px;
 }
 .follow-meta {
-  color: #333;
+  color: var(--ws-text);
   font-weight: 600;
 }
 .follow-filter {
-  color: #666;
+  color: var(--ws-text-muted);
   font-size: 12px;
 }
 .follow-error {

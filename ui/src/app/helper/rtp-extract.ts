@@ -1,4 +1,4 @@
-import { rtpBytesPerSecond, rtpSilenceByte } from './rtp-codec';
+import { codecAllowsBitstreamPad, rtpBytesPerSecond, rtpSilenceByte } from './rtp-codec';
 
 export function infoHasSsrc(info: string, ssrc: string): boolean {
   const hex = String(ssrc || '').replace(/^0x/i, '').toLowerCase();
@@ -205,9 +205,13 @@ export function udpDatagramFromFrame(frame: Uint8Array): { saddr: string; daddr:
   if (frame.byteLength >= 14) {
     let etherType = (frame[12] << 8) | frame[13];
     let offset = 14;
-    if (etherType === 0x8100 && frame.byteLength >= 18) {
+    if ((etherType === 0x8100 || etherType === 0x88a8) && frame.byteLength >= 18) {
       etherType = (frame[16] << 8) | frame[17];
       offset = 18;
+      if ((etherType === 0x8100 || etherType === 0x88a8) && frame.byteLength >= 22) {
+        etherType = (frame[20] << 8) | frame[21];
+        offset = 22;
+      }
     }
     if (etherType === 0x0800 || etherType === 0x86dd) {
       const udp = udpDatagramFromIp(frame, offset);
@@ -220,6 +224,24 @@ export function udpDatagramFromFrame(frame: Uint8Array): { saddr: string; daddr:
     const proto = (frame[14] << 8) | frame[15];
     if (proto === 0x0800 || proto === 0x86dd) {
       const udp = udpDatagramFromIp(frame, 16);
+      if (udp) {
+        return udp;
+      }
+    }
+  }
+  if (frame.byteLength >= 28) {
+    const proto2 = (frame[0] << 8) | frame[1];
+    if (proto2 === 0x0800 || proto2 === 0x86dd) {
+      const udp = udpDatagramFromIp(frame, 20);
+      if (udp) {
+        return udp;
+      }
+    }
+  }
+  if (frame.byteLength >= 32) {
+    const af = frame[0];
+    if (af === 2 || af === 24) {
+      const udp = udpDatagramFromIp(frame, 4);
       if (udp) {
         return udp;
       }
@@ -307,22 +329,51 @@ function joinPayloads(parts: Uint8Array[]): Uint8Array {
   return joined;
 }
 
-function streamToken(stream: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number }): string {
-  const ssrc = typeof stream.ssrc === 'number'
-    ? stream.ssrc.toString(16)
-    : String(stream.ssrc || '').replace(/^0x/i, '').toLowerCase();
-  return [stream.saddr || '', Number(stream.sport) || 0, stream.daddr || '', Number(stream.dport) || 0, ssrc].join('_');
+export function normRtpSsrc(ssrc: string | number | undefined): string {
+  if (typeof ssrc === 'number') {
+    return ssrc.toString(16).toLowerCase();
+  }
+  return String(ssrc || '').replace(/^0x/i, '').toLowerCase();
+}
+
+function addrMatch(a: string, b: string): boolean {
+  if (!a || !b) {
+    return true;
+  }
+  return a.toLowerCase() === b.toLowerCase();
+}
+
+export function rtpEndpointsMatch(
+  a: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number },
+  b: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number }
+): boolean {
+  if (normRtpSsrc(a.ssrc) !== normRtpSsrc(b.ssrc)) {
+    return false;
+  }
+  const ap = Number(a.sport) || 0;
+  const bp = Number(b.sport) || 0;
+  const ad = Number(a.dport) || 0;
+  const bd = Number(b.dport) || 0;
+  if (ap && bp && ap !== bp) {
+    return false;
+  }
+  if (ad && bd && ad !== bd) {
+    return false;
+  }
+  if (a.saddr && b.saddr && !addrMatch(a.saddr, b.saddr)) {
+    return false;
+  }
+  if (a.daddr && b.daddr && !addrMatch(a.daddr, b.daddr)) {
+    return false;
+  }
+  return true;
 }
 
 export function rtpPayloadForStream(buffer: ArrayBuffer | Uint8Array, stream: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number }): Uint8Array | null {
-  const wanted = streamToken(stream);
   const parts: Uint8Array[] = [];
   for (const frame of parseCapturePackets(buffer)) {
     const rtp = parseRtpDatagram(frame);
-    if (!rtp) {
-      continue;
-    }
-    if (streamToken(rtp) !== wanted) {
+    if (!rtp || !rtpEndpointsMatch(rtp, stream)) {
       continue;
     }
     parts.push(rtp.payload);
@@ -353,13 +404,12 @@ export function rtpPacketsForStream(
   buffer: ArrayBuffer | Uint8Array,
   stream: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number; items?: Array<{ f?: number; sn?: string | number }> }
 ): RtpTimedPacket[] {
-  const wanted = streamToken(stream);
   const packets: RtpTimedPacket[] = [];
   let frameNo = 0;
   for (const timed of parseCapturePacketsTimed(buffer)) {
     frameNo += 1;
     const rtp = parseRtpDatagram(timed.bytes, false);
-    if (!rtp || streamToken(rtp) !== wanted) {
+    if (!rtp || !rtpEndpointsMatch(rtp, stream)) {
       continue;
     }
     packets.push({
@@ -417,11 +467,12 @@ export function stitchRtpPayloads(packets: RtpTimedPayload[], codec: string): Rt
   const sorted = packets.slice().sort((a, b) => a.ts - b.ts);
   const rate = rtpBytesPerSecond(codec) || 8000;
   const fill = rtpSilenceByte(codec);
+  const pad = codecAllowsBitstreamPad(codec);
   const parts: Uint8Array[] = [];
   let prevEnd = sorted[0].ts;
   for (const pkt of sorted) {
     const gap = pkt.ts - prevEnd;
-    if (gap >= MIN_GAP_SEC) {
+    if (pad && gap >= MIN_GAP_SEC) {
       parts.push(silenceBytes(fill, Math.min(gap, MAX_GAP_SEC) * rate));
     }
     parts.push(pkt.payload);
@@ -435,6 +486,9 @@ export function stitchRtpPayloads(packets: RtpTimedPayload[], codec: string): Rt
 }
 
 export function padRtpAudio(clip: RtpAudioClip, sessionStart: number, codec: string): Uint8Array {
+  if (!codecAllowsBitstreamPad(codec)) {
+    return clip.bytes;
+  }
   const delay = Math.max(0, clip.startTime - sessionStart);
   if (delay < MIN_GAP_SEC) {
     return clip.bytes;
@@ -450,11 +504,10 @@ export function rtpAudioForStream(
   stream: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number },
   codec: string
 ): RtpAudioClip | null {
-  const wanted = streamToken(stream);
   const packets: RtpTimedPayload[] = [];
   for (const frame of parseCapturePacketsTimed(buffer)) {
     const rtp = parseRtpDatagram(frame.bytes);
-    if (!rtp || streamToken(rtp) !== wanted) {
+    if (!rtp || !rtpEndpointsMatch(rtp, stream)) {
       continue;
     }
     packets.push({ ts: frame.ts, payload: rtp.payload });
@@ -481,6 +534,100 @@ export function blobFromPaddedClip(clip: RtpAudioClip, sessionStart: number, cod
     return null;
   }
   return new Blob([bytes], { type: 'application/octet-stream' });
+}
+
+function dumpToBytes(raw: any): Uint8Array {
+  if (raw instanceof Uint8Array) {
+    return raw;
+  }
+  if (ArrayBuffer.isView(raw)) {
+    const view = raw as Uint8Array;
+    return new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
+  }
+  const s = String(raw || '').replace(/[^0-9a-fA-F]/g, '');
+  if (!s || s.length % 2) {
+    return new Uint8Array();
+  }
+  const out = new Uint8Array(s.length / 2);
+  for (let i = 0; i < out.length; i++) {
+    out[i] = parseInt(s.slice(i * 2, i * 2 + 2), 16);
+  }
+  return out;
+}
+
+function walkProtoTree(nodes: any[], visit: (node: any) => void) {
+  for (const node of nodes || []) {
+    if (!node) {
+      continue;
+    }
+    visit(node);
+    walkProtoTree(node.n || node.tree || [], visit);
+  }
+}
+
+export function rtpPayloadFromTree(tree: any[], bytes: Uint8Array): Uint8Array | null {
+  const box = { payload: null as Uint8Array | null };
+  walkProtoTree(tree || [], (node) => {
+    const filter = String(node.f || node.filter || '');
+    if (filter !== 'rtp.payload' && filter.indexOf('rtp.payload') !== 0) {
+      return;
+    }
+    const start = Number(node.start ?? node.h?.[0]) || 0;
+    const len = Number(node.length ?? node.h?.[1]) || 0;
+    if (len > 0 && start >= 0 && start + len <= bytes.byteLength) {
+      box.payload = bytes.subarray(start, start + len);
+    }
+  });
+  const found = box.payload;
+  if (!found || found.byteLength === 0) {
+    return null;
+  }
+  return found;
+}
+
+export interface RtpDumpPacket {
+  t?: number;
+  ts?: number;
+  bytes?: Uint8Array | string;
+  payload?: Uint8Array | string | null;
+  info?: string;
+  saddr?: string;
+  sport?: number;
+  daddr?: string;
+  dport?: number;
+  ssrc?: string | number;
+}
+
+export function rtpAudioFromDump(
+  packets: RtpDumpPacket[],
+  stream: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number },
+  codec: string
+): RtpAudioClip | null {
+  const timed: RtpTimedPayload[] = [];
+  for (const pkt of packets || []) {
+    const frameBytes = dumpToBytes(pkt.bytes);
+    let payload = pkt.payload instanceof Uint8Array ? pkt.payload : dumpToBytes(pkt.payload);
+    let rtp = frameBytes.byteLength ? parseRtpDatagram(frameBytes) : null;
+    if ((!payload || !payload.byteLength) && rtp) {
+      payload = rtp.payload;
+    }
+    if (!payload?.byteLength) {
+      continue;
+    }
+    const identity = rtp || {
+      saddr: pkt.saddr,
+      sport: pkt.sport,
+      daddr: pkt.daddr,
+      dport: pkt.dport,
+      ssrc: pkt.ssrc ?? stream.ssrc
+    };
+    if (!rtpEndpointsMatch(identity, stream)) {
+      continue;
+    }
+    const ts = Number(pkt.ts ?? pkt.t) || 0;
+    timed.push({ ts, payload });
+  }
+  return stitchRtpPayloads(timed, codec);
 }
 
 export function sessionStartForClips(clips: Array<{ startTime: number }>): number {

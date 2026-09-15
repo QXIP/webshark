@@ -6,6 +6,7 @@ importScripts('./wiregasm.js');
 let lib = null;
 let session = null;
 let ready = false;
+let lastCapture = { name: '', bytes: null };
 
 function vec(v) {
   if (!v) {
@@ -96,6 +97,67 @@ async function writeOpfsCapture(name, source) {
   }
 }
 
+function rememberCapture(name, bytes) {
+  const copy = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  lastCapture = { name: safeName(name), bytes: copy };
+}
+
+function u8FromDump(data) {
+  if (data instanceof Uint8Array) {
+    return data;
+  }
+  if (ArrayBuffer.isView(data)) {
+    return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  }
+  const s = String(data || '').replace(/[^0-9a-fA-F]/g, '');
+  if (!s || s.length % 2) {
+    return new Uint8Array();
+  }
+  const out = new Uint8Array(s.length / 2);
+  for (let i = 0; i < out.length; i++) {
+    out[i] = parseInt(s.substr(i * 2, 2), 16);
+  }
+  return out;
+}
+
+function findTreeNode(nodes, filter) {
+  const list = vec(nodes);
+  for (let i = 0; i < list.length; i++) {
+    const n = list[i];
+    if (n && n.filter && (n.filter === 'rtp.payload' || String(n.filter).indexOf('rtp.payload') === 0)) {
+      return n;
+    }
+    const hit = findTreeNode(n && n.tree, filter);
+    if (hit) {
+      return hit;
+    }
+  }
+  return null;
+}
+
+function sliceTreeField(bytes, node) {
+  if (!bytes || !node) {
+    return null;
+  }
+  const start = Number(node.start) || 0;
+  const len = Number(node.length) || 0;
+  if (len <= 0 || start < 0 || start + len > bytes.length) {
+    return null;
+  }
+  return bytes.subarray(start, start + len);
+}
+
+function rtpPayloadFromDissected(f) {
+  const src = vec(f.data_sources)[0] || {};
+  const bytes = u8FromDump(src.data || f.bytes);
+  const payloadNode = findTreeNode(f.tree, 'rtp.payload');
+  const sliced = sliceTreeField(bytes, payloadNode);
+  if (sliced && sliced.byteLength) {
+    return sliced.slice();
+  }
+  return null;
+}
+
 function wasmFree(module, ptr) {
   if (typeof module._free === 'function') {
     module._free(ptr);
@@ -142,6 +204,16 @@ async function streamFileToUpload(module, name, file) {
 
 /* Stock @goodtools/wiregasm is MEMFS-only. If a future build exports FS.filesystems.OPFS/WASMFS,
  * ingest mounts OPFS and dissects in place. Otherwise: fetch → OPFS → one HEAP copy via upload. */
+async function bytesFromResponse(res) {
+  if (!res) {
+    return new Uint8Array();
+  }
+  if (typeof res.arrayBuffer === 'function') {
+    return new Uint8Array(await res.arrayBuffer());
+  }
+  return new Uint8Array();
+}
+
 async function ingestCapture(module, name, source) {
   const fileName = safeName(name);
   if (source.url) {
@@ -149,19 +221,17 @@ async function ingestCapture(module, name, source) {
     if (!res.ok) {
       throw new Error('failed to fetch capture: ' + res.status);
     }
-    const cloned = typeof res.clone === 'function' ? res.clone() : null;
-    const opfsFile = await writeOpfsCapture(fileName, res);
+    const buf = await bytesFromResponse(res);
+    rememberCapture(fileName, buf);
+    await writeOpfsCapture(fileName, buf);
     const mounted = hasWasmFsOpfs(module) ? mountOpfsIfPossible(module) : null;
-    if (mounted && opfsFile) {
+    if (mounted) {
       return { path: mounted + '/' + fileName, via: 'wasmfs-opfs' };
     }
-    if (opfsFile) {
-      return { path: await streamFileToUpload(module, fileName, opfsFile), via: 'opfs-malloc' };
-    }
-    const buf = new Uint8Array(await (cloned || res).arrayBuffer());
     return { path: uploadViaMalloc(module, fileName, buf), via: 'malloc' };
   }
   const bytes = source.data instanceof Uint8Array ? source.data : new Uint8Array(source.data || []);
+  rememberCapture(fileName, bytes);
   await writeOpfsCapture(fileName, bytes);
   const mounted = hasWasmFsOpfs(module) ? mountOpfsIfPossible(module) : null;
   if (mounted) {
@@ -338,6 +408,46 @@ async function handle(type, payload) {
         });
       }
       return { matched: r.matched, packets: packets };
+    }
+    case 'readCapture': {
+      if (!lastCapture.bytes || !lastCapture.bytes.byteLength) {
+        throw new Error('No capture bytes in the WASM session');
+      }
+      return { name: lastCapture.name, data: lastCapture.bytes };
+    }
+    case 'rtpDump': {
+      const ssrc = String(payload.ssrc || '').replace(/^0x/i, '').toLowerCase();
+      const filters = [];
+      if (ssrc) {
+        filters.push('rtp.ssrc == 0x' + ssrc);
+      }
+      filters.push('rtp');
+      let frames = [];
+      for (let i = 0; i < filters.length; i++) {
+        try {
+          const r = requireSession().getFrames(filters[i], 0, 0);
+          frames = vec(r.frames);
+          if (frames.length) {
+            break;
+          }
+        } catch (_) { /* try a broader filter */ }
+      }
+      const packets = [];
+      for (let i = 0; i < frames.length; i++) {
+        const meta = frames[i];
+        const f = requireSession().getFrame(meta.number);
+        const cols = vec(meta.columns);
+        const src = vec(f.data_sources)[0] || {};
+        const payloadBytes = rtpPayloadFromDissected(f);
+        packets.push({
+          t: parseFloat(cols[1]) || 0,
+          num: meta.number,
+          bytes: u8FromDump(src.data || f.bytes),
+          payload: payloadBytes,
+          info: cols[6] || ''
+        });
+      }
+      return { packets: packets };
     }
     case 'columns':
       return vec(lib.getColumns());

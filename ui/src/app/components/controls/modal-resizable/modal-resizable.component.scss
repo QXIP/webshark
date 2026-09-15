@@ -45,11 +45,11 @@
   height: min(86vh, calc(100vh - 1rem));
   max-width: calc(100vw - 1rem);
   max-height: calc(100vh - 1rem);
-  border: solid 1px #ccc;
-  color: rgba(0, 0, 0, 0.87);
+  border: solid 1px var(--ws-border-strong);
+  color: var(--ws-text);
   padding: 0;
   overflow: hidden;
-  background: #fff;
+  background: var(--ws-surface);
   border-radius: 4px;
   z-index: 1;
   opacity: 1;
@@ -81,7 +81,7 @@
 
     tr {
       &:hover {
-        background-color: rgba(0, 0, 0, 0.12);
+        background-color: var(--ws-hover);
         cursor: pointer;
       }
     }

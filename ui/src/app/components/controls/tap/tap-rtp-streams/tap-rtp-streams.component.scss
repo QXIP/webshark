@@ -6,7 +6,7 @@
   min-width: 0;
   width: 100%;
   font-size: 12px;
-  background: #fff;
+  background: var(--ws-surface);
 }
 .is-data-wrapper,
 :host ::ng-deep isData,
@@ -19,7 +19,7 @@
   min-height: 0;
   min-width: 0;
   width: 100%;
-  background: #fff;
+  background: var(--ws-surface);
 }
 .rtp-layout {
   display: flex;
@@ -30,7 +30,7 @@
   min-width: 0;
   width: 100%;
   overflow: hidden;
-  background: #fff;
+  background: var(--ws-surface);
 }
 .rtp-toolbar {
   display: flex;
@@ -40,9 +40,9 @@
   padding: 0.35rem 0.6rem;
   flex-wrap: wrap;
   font-size: 11px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--ws-border);
   .error { color: #b71c1c; }
-  .note, .busy { color: rgba(0, 0, 0, 0.55); }
+  .note, .busy { color: var(--ws-text-muted); }
   button {
     display: inline-flex;
     align-items: center;
@@ -78,9 +78,9 @@
   min-height: 0;
   max-height: 28%;
   padding: 0.15rem 0.5rem 0.35rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--ws-border);
   overflow: auto;
-  background: #fff;
+  background: var(--ws-surface);
 }
 .is-analyse .rtp-player {
   max-height: 18%;
@@ -111,7 +111,7 @@
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
-  background: #fff;
+  background: var(--ws-surface);
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -129,18 +129,18 @@
   gap: 0.25rem;
   flex-wrap: wrap;
   button {
-    border: 1px solid #c5c5c5;
-    background: #fafafa;
+    border: 1px solid var(--ws-border-strong);
+    background: var(--ws-bg-muted);
     border-radius: 999px;
     padding: 0.15rem 0.7rem;
     font-size: 11px;
     line-height: 1.4;
     cursor: pointer;
-    color: #333;
+    color: var(--ws-text);
     &.active {
-      background: #3f51b5;
-      border-color: #3f51b5;
-      color: #fff;
+      background: var(--ws-primary);
+      border-color: var(--ws-primary);
+      color: var(--ws-on-primary);
     }
   }
 }
@@ -150,11 +150,11 @@
   gap: 0.75rem;
   padding: 0.1rem 0.6rem 0.3rem;
   font-size: 12px;
-  color: #333;
+  color: var(--ws-text);
   flex: 0 0 auto;
   .ssrc { font-weight: 700; font-family: ui-monospace, Menlo, monospace; }
-  .path { color: #555; }
-  .codec { color: #777; font-size: 11px; }
+  .path { color: var(--ws-text-muted); }
+  .codec { color: var(--ws-text-muted); font-size: 11px; }
 }
 .rtp-stats {
   display: flex;
@@ -162,12 +162,12 @@
   gap: 0.25rem 1rem;
   padding: 0.3rem 0.6rem;
   font-size: 11px;
-  color: #444;
-  background: #f6f7fb;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--ws-text-muted);
+  background: var(--ws-bg-muted);
+  border-top: 1px solid var(--ws-border);
+  border-bottom: 1px solid var(--ws-border);
   flex: 0 0 auto;
-  b { font-weight: 650; color: #111; }
+  b { font-weight: 650; color: var(--ws-text); }
 }
 .rtp-spark {
   display: flex;
@@ -175,20 +175,20 @@
   gap: 0.5rem;
   padding: 0.25rem 0.6rem;
   flex: 0 0 auto;
-  background: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--ws-surface);
+  border-bottom: 1px solid var(--ws-border);
   svg {
     flex: 1;
     height: 40px;
     min-width: 0;
-    background: #fbfbfb;
+    background: var(--ws-bg-muted);
   }
   polyline { stroke-width: 1.25; vector-effect: non-scaling-stroke; }
   polyline.delta { stroke: #1565c0; }
   polyline.jitter { stroke: #c62828; }
   .legend {
     font-size: 10px;
-    color: #555;
+    color: var(--ws-text-muted);
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
@@ -205,14 +205,14 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  background: #fff;
+  background: var(--ws-surface);
 }
 .rtp-table-wrap {
   flex: 1 1 30%;
   min-height: 72px;
   overflow: auto;
-  background: #fff;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--ws-surface);
+  border-top: 1px solid var(--ws-border);
 }
 .is-analyse .rtp-table-wrap {
   flex: 0 0 auto;
@@ -223,15 +223,15 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
-  background: #fff;
+  background: var(--ws-surface);
   th, td {
     text-align: left;
     padding: 0.18rem 0.4rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--ws-border);
     white-space: nowrap;
   }
   th {
-    background: #f5f5f5;
+    background: var(--ws-bg-muted);
     font-weight: 600;
     position: sticky;
     top: 0;
@@ -240,7 +240,7 @@
   .check { width: 2rem; }
   tbody tr {
     cursor: pointer;
-    &:hover { background: rgba(0, 0, 0, 0.04); }
+    &:hover { background: var(--ws-hover); }
     &.checked { background: rgba(196, 163, 90, 0.12); }
     &.active { background: rgba(63, 81, 181, 0.12); }
   }
