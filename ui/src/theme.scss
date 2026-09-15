@@ -2,19 +2,76 @@
 
 @include mat.core();
 
-$my-primary: mat.define-palette(mat.$indigo-palette, 500);
-$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-
-// The "warn" palette is optional and defaults to red if not specified.
-$my-warn: mat.define-palette(mat.$red-palette);
+$ws-primary: mat.define-palette(mat.$indigo-palette, 500);
+$ws-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$ws-warn: mat.define-palette(mat.$red-palette);
 
 $my-theme: mat.define-light-theme((
- color: (
-   primary: $my-primary,
-   accent: $my-accent,
-   warn: $my-warn,
- ),
- typography: mat.define-typography-config(),
- density: 0,
+  color: (
+    primary: $ws-primary,
+    accent: $ws-accent,
+    warn: $ws-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
 ));
+
+$ws-dark-theme: mat.define-dark-theme((
+  color: (
+    primary: $ws-primary,
+    accent: $ws-accent,
+    warn: $ws-warn,
+  ),
+));
+
 @include mat.all-component-themes($my-theme);
+
+.theme-dark {
+  @include mat.all-component-colors($ws-dark-theme);
+}
+
+:root {
+  color-scheme: light;
+  --ws-bg: #f5f7fb;
+  --ws-bg-muted: #f5f5f5;
+  --ws-surface: #ffffff;
+  --ws-row-odd: #e4f0ec;
+  --ws-row-even: #ffffff;
+  --ws-text: rgba(0, 0, 0, 0.87);
+  --ws-text-muted: rgba(0, 0, 0, 0.55);
+  --ws-border: rgba(0, 0, 0, 0.16);
+  --ws-border-strong: #ccc;
+  --ws-hover: rgba(0, 0, 0, 0.06);
+  --ws-primary: #3f51b5;
+  --ws-on-primary: #ffffff;
+  --ws-hex-hover: #abb3e0;
+  --ws-drop: #eeeeee;
+  --ws-drop-active: #cccccc;
+  --ws-chart-canvas: #ffffff;
+  --ws-chart-text: #111111;
+  --ws-chart-tooltip-bg: rgba(255, 255, 255, 0.88);
+  --ws-scrollbar: rgba(120, 120, 120, 0.7);
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --ws-bg: #121212;
+  --ws-bg-muted: #1e1e1e;
+  --ws-surface: #1e1e1e;
+  --ws-row-odd: #1a2a26;
+  --ws-row-even: #161616;
+  --ws-text: rgba(255, 255, 255, 0.87);
+  --ws-text-muted: rgba(255, 255, 255, 0.6);
+  --ws-border: rgba(255, 255, 255, 0.16);
+  --ws-border-strong: #555555;
+  --ws-hover: rgba(255, 255, 255, 0.08);
+  --ws-primary: #5c6bc0;
+  --ws-on-primary: #ffffff;
+  --ws-hex-hover: #3a4270;
+  --ws-drop: #2a2a2a;
+  --ws-drop-active: #3a3a3a;
+  --ws-chart-canvas: rgba(0, 0, 0, 0.28);
+  --ws-chart-text: #f2f2f2;
+  --ws-chart-tooltip-bg: rgba(20, 20, 20, 0.9);
+  --ws-scrollbar: rgba(180, 180, 180, 0.45);
+}

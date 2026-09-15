@@ -123,4 +123,21 @@ export class WiregasmClient {
   exportPcap(filter = ''): Promise<any> {
     return this.call('exportPcap', { filter });
   }
+
+  readCapture(): Promise<{ name?: string; data?: Uint8Array }> {
+    return this.call('readCapture');
+  }
+
+  rtpDump(stream: { ssrc?: string | number; saddr?: string; sport?: number; daddr?: string; dport?: number }): Promise<any> {
+    const ssrc = typeof stream?.ssrc === 'number'
+      ? stream.ssrc.toString(16)
+      : String(stream?.ssrc || '').replace(/^0x/i, '');
+    return this.call('rtpDump', {
+      ssrc,
+      saddr: stream?.saddr || '',
+      sport: Number(stream?.sport) || 0,
+      daddr: stream?.daddr || '',
+      dport: Number(stream?.dport) || 0
+    });
+  }
 }

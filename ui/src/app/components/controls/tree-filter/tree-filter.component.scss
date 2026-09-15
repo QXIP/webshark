@@ -1,11 +1,6 @@
-@use 'sass:map';
-@use '@angular/material' as mat;
-@import "/src/theme.scss";
-$primary: map.get($my-theme, 'primary');
-
 .selected {
-  background-color: mat.get-color-from-palette($primary);
-  color: white;
+  background-color: var(--ws-primary);
+  color: var(--ws-on-primary);
 }
 
 :host ::ng-deep .mat-tree-node {
@@ -17,7 +12,7 @@ $primary: map.get($my-theme, 'primary');
   justify-content: space-between;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--ws-hover);
   }
 }
 
@@ -40,13 +35,13 @@ $primary: map.get($my-theme, 'primary');
     top: 0px;
     left: 0px;
     position: sticky;
-    background-color: mat.get-color-from-palette($primary, default-contrast);
+    background-color: var(--ws-surface);
     width: 100%;
     z-index: 1;
     padding: 0.5rem;
     border: 0;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid var(--ws-border);
+    border-top: 1px solid var(--ws-border);
 
     &.color {
       color: transparent;

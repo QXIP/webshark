@@ -1,4 +1,4 @@
-import { captureChangeKind, isNearBottom, framesSkip, filterNewFrames, mapFrameRow, packetListRow, packetFrameId, frameTreeFromSharkd, isFrameList, sharkdErrorMessage } from './live-follow';
+import { captureChangeKind, isNearBottom, framesSkip, filterNewFrames, mapFrameRow, packetListRow, packetFrameId, frameTreeFromSharkd, isFrameList, sharkdErrorMessage, asFileList } from './live-follow';
 
 describe('live-follow', () => {
   it('classifies grow vs truncate', () => {
@@ -53,5 +53,12 @@ describe('live-follow', () => {
     expect(sharkdErrorMessage({ err: 1, errstr: 'cannot connect to sharkd using socket: /x' }))
       .toContain('cannot connect to sharkd');
     expect(sharkdErrorMessage({ error: 'Capture file is unset!' })).toBe('Capture file is unset!');
+  });
+
+  it('never feeds NgFor a boolean file list', () => {
+    expect(asFileList(true)).toEqual([]);
+    expect(asFileList(false)).toEqual([]);
+    expect(asFileList(undefined)).toEqual([]);
+    expect(asFileList([{ name: 'a.pcap' }])).toEqual([{ name: 'a.pcap' }]);
   });
 });

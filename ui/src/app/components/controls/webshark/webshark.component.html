@@ -1,4 +1,4 @@
-<div class="no-data" *ngIf="loadingCapture">Loading capture…</div>
+<div class="no-data" *ngIf="loadingCapture && !(detailsTable.length > 0)">Loading capture…</div>
 <div *ngIf="!loadingCapture && !(dataTree.length > 0) && !(detailsTable.length > 0)">
   <div style="padding: 2rem">
     <h1 *ngIf="isClientOnly" class="open-title">Open a capture</h1>

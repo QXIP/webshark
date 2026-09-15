@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { routing } from './app.routing';
 import { HttpClientModule, HTTP_INTERCEPTORS, HttpClientJsonpModule } from '@angular/common/http';
 import { ErrorInterceptor } from './helper/error.interceptor';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { ModalResizableModule } from './components/controls/modal-resizable/modal-resizable.module';
 import { TapPageModule } from './components/controls/tap/tap-page.module';
 
@@ -28,6 +29,7 @@ import { TapPageModule } from './components/controls/tap/tap-page.module';
     AppRoutingModule,
     routing,
     BrowserAnimationsModule,
+    OverlayModule,
     WebsharkModule,
     MenuModule,
     HttpClientModule,

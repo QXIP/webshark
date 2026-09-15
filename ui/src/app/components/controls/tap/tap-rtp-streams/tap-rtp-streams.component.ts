@@ -1,9 +1,9 @@
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { findReverseRtp } from '@app/helper/rtp-from-frames';
-import { ffmpegCodecForPayload } from '@app/helper/rtp-codec';
+import { ffmpegCodecFallbacks, ffmpegCodecForPayload } from '@app/helper/rtp-codec';
 import { rtpStreamToken } from '@app/helper/share-url';
-import { blobFromPaddedClip, getTranscode, rtpAudioForStream, rtpPacketsForStream, sessionStartForClips, RtpAudioClip } from '@app/helper/rtp-extract';
+import { blobFromPaddedClip, getTranscode, rtpPacketsForStream, sessionStartForClips, RtpAudioClip } from '@app/helper/rtp-extract';
 import { analyseRtpItems, analyseRtpPackets, rtpClockRate, RtpAnalyseItem, RtpAnalyseStats } from '@app/helper/rtp-analyse';
 import { rtpRelativeTime, rtpSsrcLabel, rtpStreamLabel, rtpStreamTabLabel, rtpWaveColor } from '@app/helper/rtp-player';
 
@@ -98,14 +98,9 @@ export class TapRtpStreamsComponent implements OnInit {
     if (this.captureBytes) {
       return this.captureBytes;
     }
-    const url = this.webSharkDataService.captureDownloadUrl();
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Could not read capture ${url} (${res.status})`);
-    }
-    this.progressMessage.push(`Reading data from ${this.captureFile} file`);
+    this.progressMessage.push(`Reading RTP from ${this.captureFile}`);
     this.cdr.detectChanges();
-    this.captureBytes = await res.arrayBuffer();
+    this.captureBytes = await this.webSharkDataService.getCaptureBytes();
     return this.captureBytes;
   }
   async ngOnInit() {
@@ -328,15 +323,17 @@ export class TapRtpStreamsComponent implements OnInit {
         byToken.set(rtpStreamToken(row), row);
       }
       const all = Array.from(byToken.values());
-      const buffer = await this.loadCaptureBytes();
-      const clips = all.map((row) => {
+      const clips = [];
+      for (const row of all) {
         const codec = ffmpegCodecForPayload(row?.payload);
-        const clip = rtpAudioForStream(buffer, row, codec);
-        if (!clip) {
-          throw new Error(`No RTP payload bytes for ${rtpStreamToken(row)}`);
+        if (!codec) {
+          throw new Error(`RTP stream ${rtpStreamToken(row)} is not an audio codec`);
         }
-        return { row, codec, clip };
-      });
+        this.progressMessage.push(`Extracting RTP ${row.ssrc} (${codec})`);
+        this.cdr.detectChanges();
+        const clip = await this.webSharkDataService.getRtpAudioClip(row, codec);
+        clips.push({ row, codec, clip });
+      }
       const sessionStart = sessionStartForClips(clips.map((c) => c.clip));
       const realign = this.lastSessionStart != null && Math.abs(this.lastSessionStart - sessionStart) > 0.001;
       if (realign) {
@@ -378,9 +375,20 @@ export class TapRtpStreamsComponent implements OnInit {
       this.cdr.detectChanges();
       const transcode = getTranscode();
       const safe = cacheKey.replace(/[^a-zA-Z0-9]+/g, '-');
-      blobUrl = await transcode(blob, codec, `audio-${safe}.wav`);
+      const sampleLen = clip.bytes.byteLength;
+      let lastErr: any;
+      for (const tryCodec of ffmpegCodecFallbacks(codec, sampleLen)) {
+        try {
+          blobUrl = await transcode(blob, tryCodec, `audio-${safe}.wav`);
+          if (blobUrl) {
+            break;
+          }
+        } catch (err) {
+          lastErr = err;
+        }
+      }
       if (!blobUrl) {
-        throw new Error(`FFmpeg returned no audio for ${token}`);
+        throw new Error(lastErr?.message || `FFmpeg returned no audio for ${token}`);
       }
       this.blobUrlCache.set(cacheKey, blobUrl);
     }

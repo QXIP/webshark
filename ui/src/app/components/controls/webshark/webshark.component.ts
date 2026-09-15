@@ -1,7 +1,7 @@
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { CaptureWatchService } from '@app/services/capture-watch.service';
 import { Functions } from '@app/helper/functions';
-import { framesSkip, isNearBottom, mapFrameRow, packetListRow, packetFrameId, frameTreeFromSharkd, isFrameList, sharkdErrorMessage } from '@app/helper/live-follow';
+import { framesSkip, isNearBottom, mapFrameRow, packetListRow, packetFrameId, frameTreeFromSharkd, isFrameList, sharkdErrorMessage, asFileList } from '@app/helper/live-follow';
 import { completeFieldNames, followFromFrame } from '@app/helper/wireshark-views';
 import {
   Component,
@@ -51,7 +51,13 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   private watchingCapture = '';
   private initSeq = 0;
   private selectTries = 0;
-  @Input() fileList: any = [];
+  private _fileList: any[] = [];
+  @Input() set fileList(val: any) {
+    this._fileList = asFileList(val);
+  }
+  get fileList(): any[] {
+    return this._fileList;
+  }
   @Input() framePosition: any = ['horizontal', 'vertical'];
   @Input() set range(val: any) {
     if (val) {
@@ -165,7 +171,7 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const preferred = this.webSharkDataService.getFrame() || 1;
-    this.initFrameData(preferred);
+    await this.initFrameData(preferred);
     this.cdr.detectChanges();
   }
   private syncSelectedFrame() {

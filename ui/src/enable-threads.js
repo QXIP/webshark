@@ -25,17 +25,21 @@ if(typeof window === 'undefined') {
       });
     }
 
-    let r = await fetch(request).catch(e => console.error(e));
+    try {
+      const r = await fetch(request);
+      if (!r || r.status === 0) {
+        return r;
+      }
 
-    if(r.status === 0) {
-      return r;
+      const headers = new Headers(r.headers);
+      headers.set("Cross-Origin-Embedder-Policy", "credentialless"); // or: require-corp
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
+
+      return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
+    } catch (e) {
+      console.error(e);
+      return new Response('', { status: 504, statusText: 'Gateway Timeout' });
     }
-
-    const headers = new Headers(r.headers);
-    headers.set("Cross-Origin-Embedder-Policy", "credentialless"); // or: require-corp
-    headers.set("Cross-Origin-Opener-Policy", "same-origin");
-
-    return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
   }
 
   self.addEventListener("fetch", function(e) {

@@ -7,7 +7,7 @@
   justify-content: space-between;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--ws-hover);
   }
 }
 
@@ -29,7 +29,7 @@
   padding: 0 5px !important;
 }
 .mat-mdc-list-item-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--ws-text-muted);
 }
 :host {
   display: block;
@@ -38,19 +38,19 @@
     font-size: 1.4rem;
     font-weight: 500;
     margin: 0 0 0.5rem;
-    color: rgba(0, 0, 0, 0.75);
+    color: var(--ws-text);
   }
   .open-copy {
     max-width: 36rem;
     margin: 0 0 1.25rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--ws-text-muted);
     font-size: 14px;
   }
   .list-item-hover {
     height: 3rem;
     cursor: pointer;
     &:hover {
-      background-color: rgba(0, 0, 0, 0.2);
+      background-color: var(--ws-hover);
     }
   }
   .field-sticky {
@@ -58,19 +58,19 @@
     top: 0px;
     left: 0px;
     position: sticky;
-    background-color: white;
+    background-color: var(--ws-surface);
     width: 100%;
     z-index: 1;
     padding: 0.5rem;
     border: 0;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid var(--ws-border);
+    border-top: 1px solid var(--ws-border);
   }
 
   .flex-container {
     display: flex;
     align-items: stretch;
-    background: aliceblue;
+    background: var(--ws-bg);
     height: 100%;
     max-height: 100%;
     max-width: 100vw;
@@ -113,7 +113,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0 0.5rem;
-    background: #fff;
+    background: var(--ws-surface);
   }
 
   .live-pill {
@@ -137,7 +137,7 @@
   transition: background-color 0.6s;
 
   &:hover {
-    background-color: #3f51b5;
+    background-color: var(--ws-primary);
   }
 }
 
@@ -147,5 +147,5 @@
   text-align: center;
   font-size: 1.4rem;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.3);
+  color: var(--ws-text-muted);
 }

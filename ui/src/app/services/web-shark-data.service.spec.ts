@@ -125,6 +125,57 @@ describe('WebSharkDataService', () => {
     }));
   });
 
+  it('reads capture bytes from a local File without fetching /captures', async () => {
+    const raw = new Uint8Array([0xd4, 0xc3, 0xb2, 0xa1, 9, 8, 7, 6]);
+    await svc.openLocalCapture(new File([raw], 'sip-rtp.pcap'));
+    const buf = await svc.getCaptureBytes();
+    expect(Array.from(new Uint8Array(buf))).toEqual(Array.from(raw));
+  });
+
+  it('reads capture bytes from the WASM session when the file URL is missing', async () => {
+    spyOn(window, 'fetch').and.resolveTo({ ok: false, status: 404 } as Response);
+    const raw = new Uint8Array(32).fill(7);
+    raw[0] = 0xd4; raw[1] = 0xc3; raw[2] = 0xb2; raw[3] = 0xa1;
+    backend.call.and.callFake((type: string) => {
+      if (type === 'load') {
+        return Promise.resolve({ code: 0 });
+      }
+      if (type === 'readCapture') {
+        return Promise.resolve({ name: 'voip.pcapng', data: raw });
+      }
+      return Promise.resolve({});
+    });
+    const buf = await svc.getCaptureBytes();
+    expect(backend.call).toHaveBeenCalledWith('readCapture', undefined);
+    expect(buf.byteLength).toBe(32);
+    expect(new Uint8Array(buf)[0]).toBe(0xd4);
+  });
+
+  it('extracts RTP audio from dissected session frames when pcap bytes are missing', async () => {
+    backend.call.and.callFake((type: string) => {
+      if (type === 'load') {
+        return Promise.resolve({ code: 0 });
+      }
+      if (type === 'readCapture') {
+        return Promise.reject({ err: 1, errstr: 'No capture bytes in the WASM session' });
+      }
+      if (type === 'rtpDump') {
+        return Promise.resolve({
+          packets: [
+            { t: 1, payload: new Uint8Array([0x11, 0x22]), ssrc: 'd2bd4e3e', saddr: '200.57.7.204', sport: 8000, daddr: '200.57.7.196', dport: 40376 }
+          ]
+        });
+      }
+      return Promise.resolve({});
+    });
+    spyOn(window, 'fetch').and.resolveTo({ ok: false, status: 404 } as Response);
+    const clip = await svc.getRtpAudioClip({
+      saddr: '200.57.7.204', sport: 8000, daddr: '200.57.7.196', dport: 40376, ssrc: 'd2bd4e3e', payload: 'ITU-T G.729'
+    });
+    expect(backend.call).toHaveBeenCalledWith('rtpDump', jasmine.objectContaining({ ssrc: 'd2bd4e3e' }));
+    expect(Array.from(clip.bytes)).toEqual([0x11, 0x22]);
+  });
+
   it('reuses one in-flight capture load', async () => {
     let loads = 0;
     backend.call.and.callFake((type: string) => {

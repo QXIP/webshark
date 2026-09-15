@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@use './theme.scss';
 
 html,
 body {
@@ -9,6 +10,8 @@ body {
   margin: 0;
   overflow: hidden;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--ws-bg);
+  color: var(--ws-text);
 }
 
 
@@ -24,7 +27,7 @@ body {
 
   ::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgba(199, 199, 199, 0.748);
+    background-color: var(--ws-scrollbar);
     box-shadow: 0 0 1px rgba(255, 255, 255, .5);
   }
 }

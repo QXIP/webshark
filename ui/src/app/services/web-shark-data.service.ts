@@ -11,6 +11,9 @@ import { buildClassicPcap, filteredPcapFilename, triggerBrowserDownload } from '
 import { followFromFrame, followHintFromTree, normalizeFollowProto } from '@app/helper/wireshark-views';
 import { rtpAnalyseFromStream, rtpStreamsTapFromGroups, groupRtpStreams, enrichRtpPorts } from '@app/helper/rtp-from-frames';
 import { groupVoipCalls, voipCallsTap } from '@app/helper/voip-calls';
+import { bytesFromCaptureSource } from '@app/helper/capture-bytes';
+import { rtpAudioForStream, rtpAudioFromDump, RtpAudioClip } from '@app/helper/rtp-extract';
+import { ffmpegCodecForPayload } from '@app/helper/rtp-codec';
 import { WiregasmClient } from './wiregasm-client';
 
 interface HashBuffer {
@@ -393,6 +396,79 @@ export class WebSharkDataService {
     return captureFileUrl(this.getCapture());
   }
 
+  async getCaptureBytes(): Promise<ArrayBuffer> {
+    const name = this.getCapture();
+    if (!name) {
+      throw new Error('No capture loaded');
+    }
+    const local = this.localCaptures.get(name);
+    if (local) {
+      return bytesFromCaptureSource(local);
+    }
+    try {
+      return await this.captureBytesFromSession();
+    } catch {
+      /* fall through to origin storage when a backend is present */
+    }
+    if (!environment.clientOnly) {
+      const url = this.captureDownloadUrl();
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const buf = await res.arrayBuffer();
+          this.localCaptures.set(name, new Uint8Array(buf));
+          return buf;
+        }
+      } catch {
+        /* session already tried */
+      }
+    }
+    throw new Error('Could not read capture bytes from the WASM session');
+  }
+
+  private async captureBytesFromSession(): Promise<ArrayBuffer> {
+    await this.ensureLoaded();
+    const res = await this.wiregasm.readCapture();
+    const data = res?.data ?? res;
+    if (data instanceof ArrayBuffer && data.byteLength > 24) {
+      this.localCaptures.set(this.getCapture(), new Uint8Array(data));
+      return data;
+    }
+    if (ArrayBuffer.isView(data) && data.byteLength > 24) {
+      const view = data as Uint8Array;
+      const copy = view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength);
+      this.localCaptures.set(this.getCapture(), new Uint8Array(copy));
+      return copy;
+    }
+    throw new Error('Could not read capture bytes from the WASM session');
+  }
+
+  async getRtpAudioClip(
+    row: { saddr?: string; sport?: number; daddr?: string; dport?: number; ssrc?: string | number; payload?: string },
+    codec?: string
+  ): Promise<RtpAudioClip> {
+    const audioCodec = codec || ffmpegCodecForPayload(row?.payload || '');
+    if (!audioCodec) {
+      throw new Error('RTP stream is not an audio codec');
+    }
+    try {
+      const buffer = await this.getCaptureBytes();
+      const fromFile = rtpAudioForStream(buffer, row, audioCodec);
+      if (fromFile?.bytes?.byteLength) {
+        return fromFile;
+      }
+    } catch {
+      /* fall through to dissected session frames */
+    }
+    await this.ensureLoaded();
+    const dump = await this.wiregasm.rtpDump(row);
+    const fromSession = rtpAudioFromDump(dump?.packets || [], row, audioCodec);
+    if (fromSession?.bytes?.byteLength) {
+      return fromSession;
+    }
+    throw new Error(`No RTP payload bytes for ${rtpStreamToken(row as any)}`);
+  }
+
   getMp3LinkByRowData(_rtpData: any): string {
     return this.captureDownloadUrl();
   }
@@ -551,6 +627,7 @@ export class WebSharkDataService {
     const url = isDataTimeNow ? this.urlUpload + '/now' : this.urlUpload;
 
     return this.http.post(url, formData).pipe(map(() => {
+      this.localCaptures.set(fileToUpload.name, fileToUpload);
       this.setCaptureFile(fileToUpload.name);
       this.behavior.next({ cm: 'uploaded' });
     }));
