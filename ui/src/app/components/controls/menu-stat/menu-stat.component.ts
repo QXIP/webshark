@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, ChangeDetectionStrategy, Input } from '@angular/core';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { ModalResizableService } from '../modal-resizable/modal-resizable.service';
 import { AlertService } from '../alert/alert.service';
@@ -18,6 +18,7 @@ export class MenuStatComponent implements OnInit {
   hasCapture = false;
   hasFilter = false;
   exporting = false;
+  @Input() liveFollowing = false;
   @ViewChild('fileOpen') fileOpen?: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -41,6 +42,24 @@ export class MenuStatComponent implements OnInit {
   public onMenuClick(link: string, name: string) {
     this.modalResizableService.open({ link, name });
     this.cdr.detectChanges();
+  }
+
+  openFollow() {
+    const proto = this.webSharkDataService.getLastFollow()?.proto || 'TCP';
+    this.webSharkDataService.setView('follow', { follow: proto });
+    this.modalResizableService.open({ link: `follow:${proto}`, name: `Follow ${proto} Stream` });
+  }
+
+  openFlowGraph() {
+    const filter = this.webSharkDataService.getLastFollow()?.filter || this.webSharkDataService.getFilter() || '';
+    const link = filter ? `flow:${encodeURIComponent(filter)}` : 'flow';
+    this.webSharkDataService.setView('flow');
+    this.modalResizableService.open({ link, name: 'Flow Graph' });
+  }
+
+  openIoGraph() {
+    this.webSharkDataService.setView('iograph');
+    this.modalResizableService.open({ link: 'iograph', name: 'I/O Graph' });
   }
 
   openLocalCapture() {

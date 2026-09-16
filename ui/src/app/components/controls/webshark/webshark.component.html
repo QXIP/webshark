@@ -69,17 +69,7 @@
         flex: 1;
       "
           >
-          <app-menu-stat></app-menu-stat>
-          @if (detailsTable.length > 0) {
-            <div class="tool-row">
-              <button mat-button (click)="openFollow()">Follow Stream</button>
-              <button mat-button (click)="openFlowGraph()">Flow Graph</button>
-              <button mat-button (click)="openIoGraph()">I/O Graph</button>
-              @if (liveFollowing) {
-                <span class="live-pill">live follow</span>
-              }
-            </div>
-          }
+          <app-menu-stat [liveFollowing]="liveFollowing"></app-menu-stat>
           <as-split [direction]="framePosition[0]" [gutterSize]="5">
             <as-split-area [size]="50">
               <div #tableDiv class="packet-list-host">

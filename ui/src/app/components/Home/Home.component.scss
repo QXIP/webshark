@@ -17,15 +17,70 @@
   overflow: hidden;
 }
 
+.toolbar {
+  min-height: 48px;
+  flex: 0 0 auto;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  height: 48px;
+  min-height: 48px;
+  overflow: hidden;
+  padding: 0 0.5rem;
+}
+
 .brand {
+  flex: 0 0 auto;
   background: none;
   border: 0;
   color: inherit;
   font: inherit;
   font-weight: 500;
-  padding: 0 1rem 0 0;
+  padding: 0 0.5rem 0 0.25rem;
   cursor: pointer;
   line-height: inherit;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .capture-file {
+  flex: 0 1 auto;
+  max-width: min(16rem, 28vw);
+  min-width: 0;
+  overflow: hidden;
+  .mdc-button__label {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+.capture-file-name {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.toolbar-chart {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2.25rem;
+  overflow: hidden;
+}
+
+.share-btn {
+  flex: 0 0 auto;
+}
+
+.toolbar-row > button[mat-icon-button] {
+  flex: 0 0 auto;
 }
 .brand:hover {
   opacity: 0.85;

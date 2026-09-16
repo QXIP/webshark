@@ -12,6 +12,13 @@
     <button mat-button [matMenuTriggerFor]="analyzeMenu">Analyze</button>
     <button mat-button [matMenuTriggerFor]="statisticsMenu">Statistics</button>
     <button mat-button [matMenuTriggerFor]="telephonyMenu">Telephony</button>
+    <span class="menu-stat-sep"></span>
+    <button mat-button (click)="openFollow()">Follow Stream</button>
+    <button mat-button (click)="openFlowGraph()">Flow Graph</button>
+    <button mat-button (click)="openIoGraph()">I/O Graph</button>
+    @if (liveFollowing) {
+      <span class="live-pill">live follow</span>
+    }
   </div>
 }
 

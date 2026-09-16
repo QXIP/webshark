@@ -1,6 +1,6 @@
 <div class="body-container">
-  <mat-toolbar color="primary" style="min-height: auto">
-    <mat-toolbar-row style="flex-wrap: wrap; height: auto">
+  <mat-toolbar color="primary" class="toolbar">
+    <mat-toolbar-row class="toolbar-row">
 
       @if (!isEmbed) {
         <button type="button" class="brand" (click)="goHome()">WebShark</button>
@@ -8,25 +8,26 @@
       @if (captureFile) {
         <button
           mat-raised-button
+          class="capture-file"
+          [matTooltip]="captureFile"
           (click)="downloadCapture()"
           >
           <mat-icon class="mat-18">download</mat-icon>
-          {{ captureFile }}
+          <span class="capture-file-name">{{ captureFile }}</span>
         </button>
-      }
-      <span style="flex: 1"></span>
-      @if (captureFile && !isEmbed && !isClientOnly) {
-        <button mat-button (click)="copyShareLink()">Share</button>
       }
       @if (!isEmbed) {
         <flexible-chart
           chart
-          style="flex: 3; min-width: 240px; height: 2.5rem"
+          class="toolbar-chart"
           [typeOfChart]="typeOfChart"
           (range)="webShark.range = $event"
           [data]="chartSeries"
           #headerChart
         ></flexible-chart>
+      }
+      @if (canShare) {
+        <button mat-button class="share-btn" (click)="copyShareLink()">Share</button>
       }
       @if (!isEmbed) {
         <button

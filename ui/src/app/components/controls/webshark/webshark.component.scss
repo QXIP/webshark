@@ -1,7 +1,7 @@
 :host ::ng-deep .mat-tree-node {
   min-height: 24px;
   font-family: monospace;
-  font-size: 10pt;
+  font-size: 12px;
   margin-bottom: -1px;
   overflow-wrap: anywhere;
   justify-content: space-between;
@@ -35,7 +35,7 @@
   display: block;
   flex: 1;
   .open-title {
-    font-size: 1.4rem;
+    font-size: 16px;
     font-weight: 500;
     margin: 0 0 0.5rem;
     color: var(--ws-text);
@@ -44,7 +44,7 @@
     max-width: 36rem;
     margin: 0 0 1.25rem;
     color: var(--ws-text-muted);
-    font-size: 14px;
+    font-size: 12px;
   }
   .list-item-hover {
     height: 3rem;
@@ -55,6 +55,7 @@
   }
   .field-sticky {
     font-family: monospace;
+    font-size: 12px;
     top: 0px;
     left: 0px;
     position: sticky;
@@ -108,19 +109,6 @@
     overflow: hidden;
   }
 
-  .tool-row {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0 0.5rem;
-    background: var(--ws-surface);
-  }
-
-  .live-pill {
-    font-size: 12px;
-    color: #2e7d32;
-    margin-left: 0.5rem;
-  }
 }
 
 :host ::ng-deep as-split {
@@ -145,7 +133,7 @@
   padding: 2rem;
   width: 100%;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 16px;
   font-weight: 500;
   color: var(--ws-text-muted);
 }

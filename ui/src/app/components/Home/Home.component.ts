@@ -173,6 +173,10 @@ export class HomeComponent implements OnInit {
     return this.webSharkDataService.getCapture();
   }
 
+  get canShare(): boolean {
+    return !!this.captureFile && !this.isEmbed && !this.isClientOnly;
+  }
+
   downloadCapture() {
     this.webSharkDataService.downloadCaptureFile();
   }

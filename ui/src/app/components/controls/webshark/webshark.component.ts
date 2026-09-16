@@ -358,23 +358,6 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.cdr.detectChanges();
   }
-  openFollow() {
-    const fol = this.webSharkDataService.getLastFollow();
-    const proto = fol?.proto || 'TCP';
-    this.webSharkDataService.setView('follow', { follow: proto });
-    this.modalResizableService.open({ link: `follow:${proto}`, name: `Follow ${proto} Stream` });
-  }
-  openFlowGraph() {
-    const fol = this.webSharkDataService.getLastFollow();
-    const filter = fol?.filter || this.webSharkDataService.getFilter() || '';
-    const link = filter ? `flow:${encodeURIComponent(filter)}` : 'flow';
-    this.webSharkDataService.setView('flow');
-    this.modalResizableService.open({ link, name: 'Flow Graph' });
-  }
-  openIoGraph() {
-    this.webSharkDataService.setView('iograph');
-    this.modalResizableService.open({ link: 'iograph', name: 'I/O Graph' });
-  }
   onSelected(event: any) {
     this.highlight = event.highlight;
     if (this.highlight) {
