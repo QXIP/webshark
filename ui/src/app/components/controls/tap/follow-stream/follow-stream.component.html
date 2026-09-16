@@ -5,15 +5,27 @@
       type="button"
       [disabled]="flowBusy || !filter"
       (click)="showFlowGraph()"
-    >
+      >
       {{ flowData ? 'Stream contents' : 'Flow Graph' }}
     </button>
-    <span class="follow-meta" *ngIf="meta">{{ meta }}</span>
-    <span class="follow-filter" *ngIf="filter">{{ filter }}</span>
+    @if (meta) {
+      <span class="follow-meta">{{ meta }}</span>
+    }
+    @if (filter) {
+      <span class="follow-filter">{{ filter }}</span>
+    }
   </div>
-  <p class="follow-error" *ngIf="error">{{ error }}</p>
-  <div class="follow-flow" *ngIf="flowData">
-    <tap-flow [data]="flowData"></tap-flow>
-  </div>
-  <pre class="follow-payload" *ngIf="!flowData && chunks.length"><span *ngFor="let chunk of chunks" class="chunk" [class.server]="chunk.s" (click)="selectChunk(chunk)">{{ chunk.d }}</span></pre>
+  @if (error) {
+    <p class="follow-error">{{ error }}</p>
+  }
+  @if (flowData) {
+    <div class="follow-flow">
+      <tap-flow [data]="flowData"></tap-flow>
+    </div>
+  }
+  @if (!flowData && chunks.length) {
+    <pre class="follow-payload">@for (chunk of chunks; track chunk) {
+      <span class="chunk" [class.server]="chunk.s" (click)="selectChunk(chunk)">{{ chunk.d }}</span>
+    }</pre>
+  }
 </div>

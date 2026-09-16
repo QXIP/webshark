@@ -15,12 +15,14 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/webshark",
+            "outputPath": {
+              "base": "dist/webshark",
+              "browser": ""
+            },
             "index": "src/index.html",
             "baseHref": "/webshark/",
-            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -43,17 +45,15 @@
             "scripts": [
               "src/ffmpeg/ffmpeg.min.js",
               "src/ffmpeg-init.js"
-            ]
+            ],
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
               "optimization": false,
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": false,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "budgets": [
                 {
                   "type": "initial",
@@ -93,10 +93,7 @@
               "optimization": false,
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": false,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "budgets": [
                 {
                   "type": "initial",
@@ -121,28 +118,28 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "webshark:build:production"
+              "buildTarget": "webshark:build:production"
             },
             "kiosk": {
-              "browserTarget": "webshark:build:kiosk"
+              "buildTarget": "webshark:build:kiosk"
             },
             "static": {
-              "browserTarget": "webshark:build:static"
+              "buildTarget": "webshark:build:static"
             }
           },
           "defaultConfiguration": "production"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
-            "browserTarget": "webshark:build"
+            "buildTarget": "webshark:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
             "polyfills": [
               "zone.js",
@@ -162,6 +159,32 @@
           }
         }
       }
+    }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   }
 }

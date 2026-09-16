@@ -2,10 +2,11 @@ import { HighlightService } from '@app/services/hightlight.service';
 import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-frame-hex',
-  templateUrl: './frame-hex.component.html',
-  styleUrls: ['./frame-hex.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-frame-hex',
+    templateUrl: './frame-hex.component.html',
+    styleUrls: ['./frame-hex.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FrameHexComponent implements OnInit {
   selectedFrom: number = 0;

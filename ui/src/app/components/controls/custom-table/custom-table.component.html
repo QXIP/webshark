@@ -9,43 +9,46 @@
     min-height: 0;
     flex: 1;
   "
->
+  >
   <cdk-virtual-scroll-viewport
     [tvsItemSize]="30"
     style="height: 100%; width: 100%; min-width: 0; min-height: 0; flex: 1"
-  >
+    >
     <table
       mat-table
       matSort
       style="flex: 0"
       [dataSource]="dataSource"
       class="this-table"
-    >
-      <ng-container
-        *ngFor="let item of columnsValue; let i = index"
-        [matColumnDef]="item"
       >
-        <ng-container>
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            <div style="float: left; max-width: 100%">
-              <div style="max-width: 100%; text-align: left">
-                {{ item | titlecase }}
+      @for (item of columnsValue; track item; let i = $index) {
+        <ng-container
+          [matColumnDef]="item"
+          >
+          <ng-container>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              <div style="float: left; max-width: 100%">
+                <div style="max-width: 100%; text-align: left">
+                  {{ item | titlecase }}
+                </div>
+                @if (checkFilterColumn(item)) {
+                  <div style="max-width: 100%">
+                    <input
+                      [placeholder]="item"
+                      class="search-input"
+                      value=""
+                      (keyup)="applyFilter($event, item)"
+                      />
+                  </div>
+                }
               </div>
-              <div *ngIf="checkFilterColumn(item)" style="max-width: 100%">
-                <input
-                  [placeholder]="item"
-                  class="search-input"
-                  value=""
-                  (keyup)="applyFilter($event, item)"
-                />
-              </div>
-            </div>
-          </th>
-          <td *matCellDef="let element">
-            {{ element[getKeyBy(item)] }}
-          </td>
+            </th>
+            <td *matCellDef="let element">
+              {{ element[getKeyBy(item)] }}
+            </td>
+          </ng-container>
         </ng-container>
-      </ng-container>
+      }
 
       <tbody>
         <tr mat-header-row *matHeaderRowDef="columnsValue"></tr>
@@ -67,10 +70,11 @@
     </table>
   </cdk-virtual-scroll-viewport>
   <div style="flex: 0"></div>
-  <mat-paginator
-    *ngIf="isPaginator"
-    style="flex: 0"
-    [pageSizeOptions]="[10, 25, 50, 100, 200]"
-    showFirstLastButtons
-  ></mat-paginator>
+  @if (isPaginator) {
+    <mat-paginator
+      style="flex: 0"
+      [pageSizeOptions]="[10, 25, 50, 100, 200]"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
 </div>

@@ -20,10 +20,11 @@ export interface RtpAnalyseView {
 }
 
 @Component({
-  selector: 'tap-rtp-streams',
-  templateUrl: './tap-rtp-streams.component.html',
-  styleUrls: ['./tap-rtp-streams.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'tap-rtp-streams',
+    templateUrl: './tap-rtp-streams.component.html',
+    styleUrls: ['./tap-rtp-streams.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TapRtpStreamsComponent implements OnInit {
   _data: any;
@@ -71,6 +72,9 @@ export class TapRtpStreamsComponent implements OnInit {
   }
   get anyPlaying() {
     return this.players.some((p) => p.player?.isPlaying?.());
+  }
+  get duration() {
+    return this.masterPlayer?.getDuration?.() || 0;
   }
   get currentTime() {
     return this.masterPlayer?.getCurrentTime?.() || 0;

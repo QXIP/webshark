@@ -7,10 +7,11 @@ import { Functions } from '@app/helper/functions';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 // dataSource = new TableVirtualScrollDataSource(DATA);
 @Component({
-  selector: 'app-custom-table',
-  templateUrl: './custom-table.component.html',
-  styleUrls: ['./custom-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-custom-table',
+    templateUrl: './custom-table.component.html',
+    styleUrls: ['./custom-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CustomTableComponent {
   @Input() columns: any = [];

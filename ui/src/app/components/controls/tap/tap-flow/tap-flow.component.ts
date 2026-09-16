@@ -5,10 +5,11 @@ import { formatFlowTime } from '@app/helper/voip-calls';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 
 @Component({
-  selector: 'tap-flow',
-  templateUrl: './tap-flow.component.html',
-  styleUrls: ['./tap-flow.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'tap-flow',
+    templateUrl: './tap-flow.component.html',
+    styleUrls: ['./tap-flow.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TapFlowComponent implements OnInit, AfterViewInit {
   hosts: string[] = [];

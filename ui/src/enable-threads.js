@@ -49,10 +49,8 @@ if(typeof window === 'undefined') {
 } else {
   (async function() {
     if(window.crossOriginIsolated !== false) return;
-    const host = (window.location && window.location.hostname) || '';
     const https = window.location && window.location.protocol === 'https:';
-    const trustworthy = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || https;
-    if (!trustworthy) return;
+    if (!https) return;
     const src = window.document.currentScript && window.document.currentScript.src;
     if (!src || !navigator.serviceWorker || typeof navigator.serviceWorker.register !== 'function') {
       return;

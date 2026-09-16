@@ -1,4 +1,5 @@
 import { codecAllowsBitstreamPad, rtpBytesPerSecond, rtpSilenceByte } from './rtp-codec';
+import { copyToArrayBuffer } from './capture-bytes';
 
 export function infoHasSsrc(info: string, ssrc: string): boolean {
   const hex = String(ssrc || '').replace(/^0x/i, '').toLowerCase();
@@ -533,7 +534,7 @@ export function blobFromPaddedClip(clip: RtpAudioClip, sessionStart: number, cod
   if (!bytes.byteLength) {
     return null;
   }
-  return new Blob([bytes], { type: 'application/octet-stream' });
+  return new Blob([copyToArrayBuffer(bytes)], { type: 'application/octet-stream' });
 }
 
 function dumpToBytes(raw: any): Uint8Array {
@@ -642,7 +643,7 @@ export function blobForStream(buffer: ArrayBuffer | Uint8Array, stream: { saddr?
   if (!bytes || !bytes.byteLength) {
     return null;
   }
-  return new Blob([bytes], { type: 'application/octet-stream' });
+  return new Blob([copyToArrayBuffer(bytes)], { type: 'application/octet-stream' });
 }
 
 export function rtpPayloadsBySsrc(buffer: ArrayBuffer | Uint8Array): Map<string, Uint8Array> {
@@ -670,7 +671,7 @@ export function blobForSsrc(payloads: Map<string, Uint8Array>, ssrc: string): Bl
   if (!bytes || !bytes.byteLength) {
     return null;
   }
-  return new Blob([bytes], { type: 'application/octet-stream' });
+  return new Blob([copyToArrayBuffer(bytes)], { type: 'application/octet-stream' });
 }
 
 export function getTranscode(): (blob: Blob, codec: string, output: string) => Promise<string | undefined> {

@@ -1,22 +1,18 @@
 <isData class="is-data-wrapper" [inProgress]="loading" [noDataIf]="!jsonData">
-  <ng-container [ngSwitch]="type">
-    <ng-template ngSwitchCase="flow">
+  @switch (type) {
+    @case ('flow') {
       <tap-flow [data]="jsonData"></tap-flow>
-    </ng-template>
-
-    <ng-template ngSwitchCase="rtp-streams">
+    }
+    @case ('rtp-streams') {
       <tap-rtp-streams [data]="jsonData"></tap-rtp-streams>
-    </ng-template>
-
-    <ng-template ngSwitchCase="voip-calls">
+    }
+    @case ('voip-calls') {
       <tap-voip-calls [data]="jsonData"></tap-voip-calls>
-    </ng-template>
-
-    <ng-template ngSwitchCase="follow">
+    }
+    @case ('follow') {
       <follow-stream [data]="jsonData"></follow-stream>
-    </ng-template>
-
-    <ng-template ngSwitchCase="frame">
+    }
+    @case ('frame') {
       <div class="frame-detail">
         <div class="frame-tree">
           <tree-filter [data]="jsonData.tree" [isFilter]="true"></tree-filter>
@@ -25,27 +21,25 @@
           <app-frame-hex [b64data]="jsonData.bytes"></app-frame-hex>
         </div>
       </div>
-    </ng-template>
-
-    <ng-template ngSwitchCase="iograph">
+    }
+    @case ('iograph') {
       <io-graph [data]="jsonData"></io-graph>
-    </ng-template>
-
-    <ng-template ngSwitchCase="eo">
+    }
+    @case ('eo') {
       <div class="eo-list">
-        <button
-          type="button"
-          *ngFor="let item of jsonData?.objects || []; let i = index"
-          (click)="downloadObject(item, i)"
-        >
-          {{ item.filename || item.name || ('object ' + i) }}
-        </button>
+        @for (item of jsonData?.objects || []; track item; let i = $index) {
+          <button
+            type="button"
+            (click)="downloadObject(item, i)"
+            >
+            {{ item.filename || item.name || ('object ' + i) }}
+          </button>
+        }
       </div>
       <chart-and-table [data]="jsonData" (rowClick)="onRowClick($event)"></chart-and-table>
-    </ng-template>
-
-    <ng-template ngSwitchDefault>
+    }
+    @default {
       <chart-and-table [data]="jsonData" (rowClick)="onRowClick($event)"></chart-and-table>
-    </ng-template>
-  </ng-container>
+    }
+  }
 </isData>

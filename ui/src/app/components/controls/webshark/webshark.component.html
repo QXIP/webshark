@@ -1,29 +1,37 @@
-<div class="no-data" *ngIf="loadingCapture && !(detailsTable.length > 0)">Loading capture…</div>
-<div *ngIf="!loadingCapture && !(dataTree.length > 0) && !(detailsTable.length > 0)">
-  <div style="padding: 2rem">
-    <h1 *ngIf="isClientOnly" class="open-title">Open a capture</h1>
-    <p *ngIf="isClientOnly" class="open-copy">
-      WebShark runs in your browser. Drop a .pcap or .pcapng from your computer — nothing is uploaded.
-    </p>
-    <div
-      style="min-width: 200px; margin-bottom: 1rem"
-      [style.height]="isKIOSK || isClientOnly ? '40vh' : '100px'"
-    >
-      <pcap-uploader></pcap-uploader>
-    </div>
-    <mat-list *ngIf="!isKIOSK && !isClientOnly">
-      <h1 mat-subheader>Files</h1>
+@if (loadingCapture && !(detailsTable.length > 0)) {
+  <div class="no-data">Loading capture…</div>
+}
+@if (!loadingCapture && !(dataTree.length > 0) && !(detailsTable.length > 0)) {
+  <div>
+    <div style="padding: 2rem">
+      @if (isClientOnly) {
+        <h1 class="open-title">Open a capture</h1>
+      }
+      @if (isClientOnly) {
+        <p class="open-copy">
+          WebShark runs in your browser. Drop a .pcap or .pcapng from your computer — nothing is uploaded.
+        </p>
+      }
       <div
-        *ngFor="let note of fileList"
-        class="list-item-hover"
-        (click)="onClickFile(note.name)"
-      >
-        <mat-list-item>
-          <mat-divider></mat-divider>
-          <div style="height: 5px"></div>
-          <mat-icon
-            mat-list-icon
-            color="primary"
+        style="min-width: 200px; margin-bottom: 1rem"
+        [style.height]="isKIOSK || isClientOnly ? '40vh' : '100px'"
+        >
+        <pcap-uploader></pcap-uploader>
+      </div>
+      @if (!isKIOSK && !isClientOnly) {
+        <mat-list>
+          <h1 mat-subheader>Files</h1>
+          @for (note of fileList; track note) {
+            <div
+              class="list-item-hover"
+              (click)="onClickFile(note.name)"
+              >
+              <mat-list-item>
+                <mat-divider></mat-divider>
+                <div style="height: 5px"></div>
+                <mat-icon
+                  mat-list-icon
+                  color="primary"
             style="
               float: left;
               margin: 0px 12px;
@@ -31,23 +39,26 @@
               width: 40px;
               height: 40px;
             "
-            >note</mat-icon
-          >
-          <div mat-line>
-            <strong>{{ note.name }}</strong>
-          </div>
-          <div mat-line>{{ note.size }} bytes</div>
-        </mat-list-item>
+                  >note</mat-icon
+                  >
+                  <div mat-line>
+                    <strong>{{ note.name }}</strong>
+                  </div>
+                  <div mat-line>{{ note.size }} bytes</div>
+                </mat-list-item>
+              </div>
+            }
+          </mat-list>
+        }
       </div>
-    </mat-list>
-  </div>
-</div>
-<div class="flex-container">
-  <isData
-    *ngIf="!(!(dataTree.length > 0) && !(detailsTable.length > 0))"
-    [noDataIf]="!(dataTree.length > 0) && !(detailsTable.length > 0)"
-  >
-    <div
+    </div>
+  }
+  <div class="flex-container">
+    @if (!(!(dataTree.length > 0) && !(detailsTable.length > 0))) {
+      <isData
+        [noDataIf]="!(dataTree.length > 0) && !(detailsTable.length > 0)"
+        >
+        <div
       style="
         display: flex;
         flex-direction: column;
@@ -57,73 +68,82 @@
         min-width: 0;
         flex: 1;
       "
-    >
-      <app-menu-stat></app-menu-stat>
-      <div class="tool-row" *ngIf="detailsTable.length > 0">
-        <button mat-button (click)="openFollow()">Follow Stream</button>
-        <button mat-button (click)="openFlowGraph()">Flow Graph</button>
-        <button mat-button (click)="openIoGraph()">I/O Graph</button>
-        <span class="live-pill" *ngIf="liveFollowing">live follow</span>
-      </div>
-      <as-split [direction]="framePosition[0]" [gutterSize]="5">
-        <as-split-area [size]="50">
-          <div #tableDiv class="packet-list-host">
-            <input
-              matInput
-              class="field-sticky"
-              style="padding: 1rem"
-              type="text"
-              autocomplete="off"
-              placeholder="Apply a display filter"
-              [(ngModel)]="textFilterGrid"
-              [matAutocomplete]="filterAuto"
-              (ngModelChange)="onFilterInput($event)"
-              (keydown.enter)="onFilterEnter()"
-            />
-            <mat-autocomplete #filterAuto="matAutocomplete" (optionSelected)="setFilter($event.option.value)">
-              <mat-option *ngFor="let choice of filterChoices" [value]="choice">{{ choice }}</mat-option>
-            </mat-autocomplete>
-            <app-custom-table
-              [details]="filterGrid(detailsTable)"
-              [columns]="columnsTable"
-              [isSelectedByClick]="true"
-              [isPaginator]="false"
-              (rowClick)="showMessage($event)"
-              (rowDblClick)="openDetails($event)"
-              class="packet-list-table"
-              #dataGridTable
-            ></app-custom-table>
-          </div>
-        </as-split-area>
-        <as-split-area [size]="50">
-          <as-split [direction]="framePosition[1]" [gutterSize]="5">
+          >
+          <app-menu-stat></app-menu-stat>
+          @if (detailsTable.length > 0) {
+            <div class="tool-row">
+              <button mat-button (click)="openFollow()">Follow Stream</button>
+              <button mat-button (click)="openFlowGraph()">Flow Graph</button>
+              <button mat-button (click)="openIoGraph()">I/O Graph</button>
+              @if (liveFollowing) {
+                <span class="live-pill">live follow</span>
+              }
+            </div>
+          }
+          <as-split [direction]="framePosition[0]" [gutterSize]="5">
             <as-split-area [size]="50">
-              <tree-filter
-                *ngIf="dataTree && dataTree.length > 0"
-                [data]="dataTree"
-                style="flex: 1; overflow: auto"
-                (clickRow)="onSelected($event)"
-                [isFilter]="true"
-                [selectedHexArray]="selectedHexArray"
-                (filter)="setFilter($event)"
-              ></tree-filter>
-              <h1
-                class="no-data"
-                *ngIf="!dataTree || (dataTree && dataTree.length === 0)"
-              >
-                No Data
-              </h1>
+              <div #tableDiv class="packet-list-host">
+                <input
+                  matInput
+                  class="field-sticky"
+                  style="padding: 1rem"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Apply a display filter"
+                  [(ngModel)]="textFilterGrid"
+                  [matAutocomplete]="filterAuto"
+                  (ngModelChange)="onFilterInput($event)"
+                  (keydown.enter)="onFilterEnter()"
+                  />
+                <mat-autocomplete #filterAuto="matAutocomplete" (optionSelected)="setFilter($event.option.value)">
+                  @for (choice of filterChoices; track choice) {
+                    <mat-option [value]="choice">{{ choice }}</mat-option>
+                  }
+                </mat-autocomplete>
+                <app-custom-table
+                  [details]="filterGrid(detailsTable)"
+                  [columns]="columnsTable"
+                  [isSelectedByClick]="true"
+                  [isPaginator]="false"
+                  (rowClick)="showMessage($event)"
+                  (rowDblClick)="openDetails($event)"
+                  class="packet-list-table"
+                  #dataGridTable
+                ></app-custom-table>
+              </div>
             </as-split-area>
             <as-split-area [size]="50">
-              <app-frame-hex
-                [b64data]="frameHexDataBase64"
-                (onSelectedHex)="onSelectedHex($event)"
-                style="flex: 1"
-              ></app-frame-hex>
+              <as-split [direction]="framePosition[1]" [gutterSize]="5">
+                <as-split-area [size]="50">
+                  @if (dataTree && dataTree.length > 0) {
+                    <tree-filter
+                      [data]="dataTree"
+                      style="flex: 1; overflow: auto"
+                      (clickRow)="onSelected($event)"
+                      [isFilter]="true"
+                      [selectedHexArray]="selectedHexArray"
+                      (filter)="setFilter($event)"
+                    ></tree-filter>
+                  }
+                  @if (!dataTree || (dataTree && dataTree.length === 0)) {
+                    <h1
+                      class="no-data"
+                      >
+                      No Data
+                    </h1>
+                  }
+                </as-split-area>
+                <as-split-area [size]="50">
+                  <app-frame-hex
+                    [b64data]="frameHexDataBase64"
+                    (onSelectedHex)="onSelectedHex($event)"
+                    style="flex: 1"
+                  ></app-frame-hex>
+                </as-split-area>
+              </as-split>
             </as-split-area>
           </as-split>
-        </as-split-area>
-      </as-split>
-    </div>
-  </isData>
-</div>
+        </div>
+      </isData>
+    }
+  </div>

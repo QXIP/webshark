@@ -1,7 +1,7 @@
 import { ModalResizableService } from './../controls/modal-resizable/modal-resizable.service';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { ThemeService } from '@app/services/theme.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
 import { iframeEmbedSnippet, parseViewState } from '@app/helper/share-url';
@@ -9,9 +9,11 @@ import { captureFileUrl } from '@app/helper/wiregasm-adapt';
 
 declare const transcode: Function;
 @Component({
-  selector: 'app-Home',
-  templateUrl: './Home.component.html',
-  styleUrls: ['./Home.component.scss']
+    selector: 'app-Home',
+    templateUrl: './Home.component.html',
+    styleUrls: ['./Home.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class HomeComponent implements OnInit {
   typeOfChart: any = 'area';

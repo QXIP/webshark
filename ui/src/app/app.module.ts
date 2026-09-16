@@ -12,39 +12,32 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { routing } from './app.routing';
-import { HttpClientModule, HTTP_INTERCEPTORS, HttpClientJsonpModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withJsonpSupport, withXhr } from '@angular/common/http';
 import { ErrorInterceptor } from './helper/error.interceptor';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { ModalResizableModule } from './components/controls/modal-resizable/modal-resizable.module';
 import { TapPageModule } from './components/controls/tap/tap-page.module';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent
-  ],
-  imports: [
-    MaterialModule,
-    BrowserModule,
-    AppRoutingModule,
-    routing,
-    BrowserAnimationsModule,
-    OverlayModule,
-    WebsharkModule,
-    MenuModule,
-    HttpClientModule,
-    HttpClientJsonpModule,
-    FilesPageModule,
-    PcapUploaderModule,
-    FrameHexModule,
-    ModalResizableModule,
-    TapPageModule,
-    FlexibleChartModule
-  ],
-  bootstrap: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-  ]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        HomeComponent
+    ],
+    bootstrap: [AppComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA], imports: [MaterialModule,
+        BrowserModule,
+        AppRoutingModule,
+        routing,
+        BrowserAnimationsModule,
+        OverlayModule,
+        WebsharkModule,
+        MenuModule,
+        FilesPageModule,
+        PcapUploaderModule,
+        FrameHexModule,
+        ModalResizableModule,
+        TapPageModule,
+        FlexibleChartModule], providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+        provideHttpClient(withXhr(), withInterceptorsFromDi(), withJsonpSupport()),
+    ] })
 export class AppModule { }

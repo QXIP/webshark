@@ -1,10 +1,10 @@
-import { Component, Inject, Injectable } from '@angular/core';
+import { Component, Inject, Injectable, ChangeDetectionStrategy } from '@angular/core';
 import { MatSnackBar, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'alert-template',
-  template: `<div [className]="data.type">{{data.message}}</div>`,
-  styles: [`
+    selector: 'alert-template',
+    template: `<div [className]="data.type">{{data.message}}</div>`,
+    styles: [`
     .success {
       color: white;
       padding: 1rem;
@@ -21,6 +21,8 @@ import { MatSnackBar, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
     }
 
   `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 class AlertTemplateComponent {
   constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any) { }

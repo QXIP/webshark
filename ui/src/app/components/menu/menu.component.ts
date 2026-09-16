@@ -4,10 +4,11 @@ import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { tapInfoLists } from '@app/helper/wireshark-views';
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-menu',
+    templateUrl: './menu.component.html',
+    styleUrls: ['./menu.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class MenuComponent implements OnInit {
   menuTree: any = null;

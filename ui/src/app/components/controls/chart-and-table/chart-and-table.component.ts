@@ -1,12 +1,14 @@
 import { ChartType, ChartData } from './../flexible-chart/flexible-chart.component';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { hash } from '@app/helper/functions';
 import { tapCellValue, tapColumnKeys, tapDisplayRows, tapTableTitle } from '@app/helper/wiregasm-adapt';
 
 @Component({
-  selector: 'chart-and-table',
-  templateUrl: './chart-and-table.component.html',
-  styleUrls: ['./chart-and-table.component.scss']
+    selector: 'chart-and-table',
+    templateUrl: './chart-and-table.component.html',
+    styleUrls: ['./chart-and-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ChartAndTableComponent implements OnInit {
   private _data: any = [];

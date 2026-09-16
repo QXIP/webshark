@@ -1,44 +1,46 @@
-<div class="lds-container onlyLoader"
-    *ngIf="inProgress">
+@if (inProgress) {
+  <div class="lds-container onlyLoader"
+    >
     <h3 style="margin: 0">
-        <div class="lds-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
+      <div class="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </h3>
-</div>
+  </div>
+}
 <form [hidden]="!!filename"
-    style="height: 100%;">
-    <div class="file-upload-container">
-        <label for="fileSelect"
-            [className]="'fileselect' + (idDrugOver ? ' drugOver' : '') + (isClientOnly ? ' client-only' : '')"></label>
-        <input placeholder=""
-            value=""
-            type="file"
-            id="fileSelect"
-            accept=".pcapng,.pcap,.cap,application/vnd.tcpdump.pcap"
-            #fileSelect>
-        <!-- <fa-icon icon="upload"></fa-icon> -->
-    </div>
+  style="height: 100%;">
+  <div class="file-upload-container">
+    <label for="fileSelect"
+    [className]="'fileselect' + (idDrugOver ? ' drugOver' : '') + (isClientOnly ? ' client-only' : '')"></label>
+    <input placeholder=""
+      value=""
+      type="file"
+      id="fileSelect"
+      accept=".pcapng,.pcap,.cap,application/vnd.tcpdump.pcap"
+      #fileSelect>
+    <!-- <fa-icon icon="upload"></fa-icon> -->
+  </div>
 </form>
-<ng-container *ngIf="filename && !inProgress">
-    <p>
-        File: <strong>{{ filename }}</strong>
-        <br />
-        Size: <strong>{{ filesize }}Kb</strong>
-    </p>
-    <!-- <hr />
-    <mat-checkbox [(ngModel)]="isDataTimeNow">
-        Set date-time from now
-    </mat-checkbox> -->
-    <hr />
-    <button mat-raised-button
-        (click)="filename = ''"
-        cdkFocusInitial>Clear</button>
-    <button mat-raised-button
-        color="primary"
-        (click)="onSubmit()"
-        cdkFocusInitial>{{ isClientOnly ? 'Open' : 'Upload' }}</button>
-</ng-container>
+@if (filename && !inProgress) {
+  <p>
+    File: <strong>{{ filename }}</strong>
+    <br />
+    Size: <strong>{{ filesize }}Kb</strong>
+  </p>
+  <!-- <hr />
+  <mat-checkbox [(ngModel)]="isDataTimeNow">
+    Set date-time from now
+  </mat-checkbox> -->
+  <hr />
+  <button mat-raised-button
+    (click)="filename = ''"
+  cdkFocusInitial>Clear</button>
+  <button mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+  cdkFocusInitial>{{ isClientOnly ? 'Open' : 'Upload' }}</button>
+}

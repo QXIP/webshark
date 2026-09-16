@@ -4,7 +4,7 @@
       class="player-card"
       (click)="setRecActive()"
       [class.active]="rec.isActive"
-    >
+      >
       <div class="player-card-data">
         <div>
           CurrentTime:
@@ -18,16 +18,19 @@
         class="waveform"
         (wheel)="onZoomAudio($event, rec.player)"
       ></div>
-      <div *ngIf="rec.noData">
-        <h2>Audio file is empty (size : 0b)</h2>
-      </div>
-      <div class="player-controls" *ngIf="!rec.noData">
-        <!-- <button
+      @if (rec.noData) {
+        <div>
+          <h2>Audio file is empty (size : 0b)</h2>
+        </div>
+      }
+      @if (!rec.noData) {
+        <div class="player-controls">
+          <!-- <button
           mat-mini-fab
           color="primary"
           (click)="seekAndCenter(rec.player, -0.05)"
           aria-label="rewind"
-        >
+          >
           <mat-icon>fast_rewind</mat-icon>
         </button> -->
         <a [href]="rec.mp3" download="rec.mp3" style="float: right">
@@ -38,24 +41,29 @@
           color="primary"
           aria-label="play/stop"
           (click)="rec.player.playPause()"
-        >
-          <mat-icon *ngIf="!rec.player?.isPlaying()">play_arrow</mat-icon>
-          <mat-icon *ngIf="rec.player?.isPlaying()">pause</mat-icon>
+          >
+          @if (!rec.player?.isPlaying()) {
+            <mat-icon>play_arrow</mat-icon>
+          }
+          @if (rec.player?.isPlaying()) {
+            <mat-icon>pause</mat-icon>
+          }
         </button>
-
         <!-- <button
-          mat-mini-fab
-          color="primary"
-          (click)="seekAndCenter(rec.player, 0.05)"
-          aria-label="forward"
+        mat-mini-fab
+        color="primary"
+        (click)="seekAndCenter(rec.player, 0.05)"
+        aria-label="forward"
         >
-          <mat-icon>fast_forward</mat-icon>
-        </button> -->
-      </div>
-    </mat-card>
-  </div>
+        <mat-icon>fast_forward</mat-icon>
+      </button> -->
+    </div>
+  }
+</mat-card>
+</div>
 
-  <mat-card *ngIf="selectedColumns?.length">
+@if (selectedColumns?.length) {
+  <mat-card>
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
       <mat-tab label="TableData">
         <app-custom-table
@@ -81,17 +89,17 @@
             align-content: stretch;
             flex-wrap: nowrap;
           "
-        >
+          >
           <section style="display: flex; flex: 0">
-            <mat-checkbox
-            class="labels"
-              *ngFor="let item of chartFilter"
-              color="primary"
-              [(ngModel)]="item.value"
-              (click)="onFilterChart()"
-            >
-              <div style="display: flex; align-items: center; margin: 0.5rem;">
-                <div
+            @for (item of chartFilter; track item) {
+              <mat-checkbox
+                class="labels"
+                color="primary"
+                [(ngModel)]="item.value"
+                (click)="onFilterChart()"
+                >
+                <div style="display: flex; align-items: center; margin: 0.5rem;">
+                  <div
                   style="
                     display: inline-block;
                     width: 40px;
@@ -100,12 +108,13 @@
                     border-radius: 50rem;
                     border: 1px solid;
                   "
-                  [style.backgroundColor]="item.value ? item.color : 'transparent'"
-                  [style.borderColor]="!item.value ? item.color : 'transparent'"
-                ></div>
-                {{ item.title }}
-              </div>
-            </mat-checkbox>
+                    [style.backgroundColor]="item.value ? item.color : 'transparent'"
+                    [style.borderColor]="!item.value ? item.color : 'transparent'"
+                  ></div>
+                  {{ item.title }}
+                </div>
+              </mat-checkbox>
+            }
           </section>
           <mat-radio-group aria-label="Select an option" [(ngModel)]="typeOfChartRadio">
             <mat-radio-button color="primary" value="line">Line</mat-radio-button>
@@ -140,21 +149,21 @@
         </div>
       </mat-tab>
     </mat-tab-group>
-
     <!-- <cdk-virtual-scroll-viewport
-      [itemSize]="18"
-      style="height: 200px; width: 100%"
+    [itemSize]="18"
+    style="height: 200px; width: 100%"
     > -->
     <!-- <div style="display: flex">
-      <div *ngFor="let col of selectedColumns" style="flex: 1; height: 18px">
-        <strong>{{ columnDictionary[col] }}</strong>
-      </div>
+    <div *ngFor="let col of selectedColumns" style="flex: 1; height: 18px">
+      <strong>{{ columnDictionary[col] }}</strong>
     </div>
-    <div *ngFor="let item of selectedStreams" style="display: flex">
-      <div *ngFor="let col of selectedColumns" style="flex: 1; height: 18px">
-        <span>{{ item[col] }}</span>
-      </div>
-    </div> -->
-    <!-- </cdk-virtual-scroll-viewport> -->
-  </mat-card>
+  </div>
+  <div *ngFor="let item of selectedStreams" style="display: flex">
+    <div *ngFor="let col of selectedColumns" style="flex: 1; height: 18px">
+      <span>{{ item[col] }}</span>
+    </div>
+  </div> -->
+<!-- </cdk-virtual-scroll-viewport> -->
+</mat-card>
+}
 </modal-resizable>

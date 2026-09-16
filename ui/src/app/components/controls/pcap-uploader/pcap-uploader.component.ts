@@ -1,14 +1,16 @@
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
-import { Component, Input, Output, EventEmitter, AfterViewInit, ViewChild, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, ViewChild, ChangeDetectorRef, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { environment } from '@environments/environment';
 import { AlertService } from '../alert/alert.service';
 
 
 @Component({
-  selector: 'pcap-uploader',
-  templateUrl: './pcap-uploader.component.html',
-  styleUrls: ['./pcap-uploader.component.scss']
+    selector: 'pcap-uploader',
+    templateUrl: './pcap-uploader.component.html',
+    styleUrls: ['./pcap-uploader.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 
 export class PcapUploaderComponent implements OnInit, OnDestroy, AfterViewInit {

@@ -22,10 +22,11 @@ interface FlatNode {
 }
 
 @Component({
-  selector: 'tree-filter',
-  templateUrl: './tree-filter.component.html',
-  styleUrls: ['./tree-filter.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'tree-filter',
+    templateUrl: './tree-filter.component.html',
+    styleUrls: ['./tree-filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TreeFilterComponent implements OnInit, AfterViewInit {
   @Input() isFilterLine = true;

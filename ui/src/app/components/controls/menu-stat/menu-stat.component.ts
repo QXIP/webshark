@@ -1,13 +1,15 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { ModalResizableService } from '../modal-resizable/modal-resizable.service';
 import { AlertService } from '../alert/alert.service';
 import { tapInfoLists } from '@app/helper/wireshark-views';
 
 @Component({
-  selector: 'app-menu-stat',
-  templateUrl: './menu-stat.component.html',
-  styleUrls: ['./menu-stat.component.scss']
+    selector: 'app-menu-stat',
+    templateUrl: './menu-stat.component.html',
+    styleUrls: ['./menu-stat.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class MenuStatComponent implements OnInit {
   convs: any[] = [];

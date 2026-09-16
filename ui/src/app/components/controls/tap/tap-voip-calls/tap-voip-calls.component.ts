@@ -4,10 +4,11 @@ import { ModalResizableService } from '../../modal-resizable/modal-resizable.ser
 import { sipFlowFromCall } from '@app/helper/voip-calls';
 
 @Component({
-  selector: 'tap-voip-calls',
-  templateUrl: './tap-voip-calls.component.html',
-  styleUrls: ['./tap-voip-calls.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'tap-voip-calls',
+    templateUrl: './tap-voip-calls.component.html',
+    styleUrls: ['./tap-voip-calls.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TapVoipCallsComponent implements OnInit {
   calls: any[] = [];

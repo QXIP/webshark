@@ -24,11 +24,11 @@ import { ModalResizableService } from '../modal-resizable/modal-resizable.servic
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-webshark',
-  templateUrl: './webshark.component.html',
-  styleUrls: ['./webshark.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-
+    selector: 'app-webshark',
+    templateUrl: './webshark.component.html',
+    styleUrls: ['./webshark.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   textFilterGrid: string = '';
