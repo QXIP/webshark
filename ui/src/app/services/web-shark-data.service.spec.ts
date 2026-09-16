@@ -1,8 +1,9 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { WebSharkDataService } from './web-shark-data.service';
 import { WIREGASM_BACKEND } from './wiregasm-client';
 import { environment } from '@environments/environment';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe('WebSharkDataService', () => {
   let svc: WebSharkDataService;
@@ -31,9 +32,9 @@ describe('WebSharkDataService', () => {
       })
     };
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: WIREGASM_BACKEND, useValue: backend }]
-    });
+    imports: [],
+    providers: [{ provide: WIREGASM_BACKEND, useValue: backend }, provideHttpClient(withXhr(), withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     svc = TestBed.inject(WebSharkDataService);
     http = TestBed.inject(HttpTestingController);
     svc.setCaptureFile('voip.pcapng');

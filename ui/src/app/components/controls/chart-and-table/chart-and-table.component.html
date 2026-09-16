@@ -1,25 +1,28 @@
-<ng-container *ngIf="data?.length">
+@if (data?.length) {
   <isData [noDataIf]="false">
     <as-split direction="vertical" [gutterSize]="5">
-      <as-split-area [size]="40" *ngIf="chartData?.length">
-        <flexible-chart
-          [data]="chartData"
-          typeOfChart="bar"
-          [isRange]="false"
+      @if (chartData?.length) {
+        <as-split-area [size]="40">
+          <flexible-chart
+            [data]="chartData"
+            typeOfChart="bar"
+            [isRange]="false"
           [options]="{
             axisX: true,
             axisY: true
           }"
-        ></flexible-chart>
-      </as-split-area>
-
+          ></flexible-chart>
+        </as-split-area>
+      }
       <as-split-area [size]="chartData?.length ? 60 : 100">
         <isData [noDataIf]="!data?.length">
-          <h1 *ngIf="title">{{ title }}</h1>
+          @if (title) {
+            <h1>{{ title }}</h1>
+          }
           <cdk-virtual-scroll-viewport
             [itemSize]="18"
             style="height: calc(100% - 4rem); min-height: 200px; width: 100%"
-          >
+            >
             <div
               *cdkVirtualFor="let item of data; let odd = odd"
               [ngStyle]="
@@ -32,10 +35,10 @@
                 cursor: pointer;
               "
               (click)="onRowClick(item)"
-            >
-              <div
-                *ngFor="let col of columns; let idx = index"
-                [style.flex]="idx === 3 ? 3 : 1"
+              >
+              @for (col of columns; track col; let idx = $index) {
+                <div
+                  [style.flex]="idx === 3 ? 3 : 1"
                 style="
                   margin-top: -1px;
                   margin-left: -1px;
@@ -44,13 +47,14 @@
                   padding: 0.5rem;
                   border: 1px solid #999;
                 "
-              >
-                {{ col }}: {{ cellValue(item, col) }}
-              </div>
+                  >
+                  {{ col }}: {{ cellValue(item, col) }}
+                </div>
+              }
             </div>
           </cdk-virtual-scroll-viewport>
         </isData>
       </as-split-area>
     </as-split>
   </isData>
-</ng-container>
+}

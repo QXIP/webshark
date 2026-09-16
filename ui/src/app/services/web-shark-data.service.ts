@@ -11,7 +11,7 @@ import { buildClassicPcap, filteredPcapFilename, triggerBrowserDownload } from '
 import { followFromFrame, followHintFromTree, normalizeFollowProto } from '@app/helper/wireshark-views';
 import { rtpAnalyseFromStream, rtpStreamsTapFromGroups, groupRtpStreams, enrichRtpPorts } from '@app/helper/rtp-from-frames';
 import { groupVoipCalls, voipCallsTap } from '@app/helper/voip-calls';
-import { bytesFromCaptureSource } from '@app/helper/capture-bytes';
+import { bytesFromCaptureSource, copyToArrayBuffer } from '@app/helper/capture-bytes';
 import { rtpAudioForStream, rtpAudioFromDump, RtpAudioClip } from '@app/helper/rtp-extract';
 import { ffmpegCodecForPayload } from '@app/helper/rtp-codec';
 import { WiregasmClient } from './wiregasm-client';
@@ -436,7 +436,7 @@ export class WebSharkDataService {
     }
     if (ArrayBuffer.isView(data) && data.byteLength > 24) {
       const view = data as Uint8Array;
-      const copy = view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength);
+      const copy = copyToArrayBuffer(view);
       this.localCaptures.set(this.getCapture(), new Uint8Array(copy));
       return copy;
     }

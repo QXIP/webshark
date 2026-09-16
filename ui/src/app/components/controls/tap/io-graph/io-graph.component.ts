@@ -1,12 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { iographSeries } from '@app/helper/wireshark-views';
 import { ChartData, ChartType } from '../../flexible-chart/flexible-chart.component';
 
 @Component({
-  selector: 'io-graph',
-  templateUrl: './io-graph.component.html',
-  styleUrls: ['./io-graph.component.scss']
+    selector: 'io-graph',
+    templateUrl: './io-graph.component.html',
+    styleUrls: ['./io-graph.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class IoGraphComponent implements OnInit {
   chartData: ChartData[] = [];

@@ -4,14 +4,23 @@
   hidden
   accept=".pcapng,.pcap,.cap,application/vnd.tcpdump.pcap"
   (change)="onLocalFilePicked($event)"
-/>
+  />
 
-<div *ngIf="hasCapture" class="menu-stat">
-  <button mat-button [matMenuTriggerFor]="fileMenu">File</button>
-  <button mat-button [matMenuTriggerFor]="analyzeMenu">Analyze</button>
-  <button mat-button [matMenuTriggerFor]="statisticsMenu">Statistics</button>
-  <button mat-button [matMenuTriggerFor]="telephonyMenu">Telephony</button>
-</div>
+@if (hasCapture) {
+  <div class="menu-stat">
+    <button mat-button [matMenuTriggerFor]="fileMenu">File</button>
+    <button mat-button [matMenuTriggerFor]="analyzeMenu">Analyze</button>
+    <button mat-button [matMenuTriggerFor]="statisticsMenu">Statistics</button>
+    <button mat-button [matMenuTriggerFor]="telephonyMenu">Telephony</button>
+    <span class="menu-stat-sep"></span>
+    <button mat-button (click)="openFollow()">Follow Stream</button>
+    <button mat-button (click)="openFlowGraph()">Flow Graph</button>
+    <button mat-button (click)="openIoGraph()">I/O Graph</button>
+    @if (liveFollowing) {
+      <span class="live-pill">live follow</span>
+    }
+  </div>
+}
 
 <mat-menu #fileMenu="matMenu">
   <button mat-menu-item (click)="openLocalCapture()">
@@ -31,24 +40,28 @@
     <mat-icon>download</mat-icon>
     <span>Download Original Capture</span>
   </button>
-  <mat-divider *ngIf="exportObjects.length"></mat-divider>
-  <button
-    *ngIf="exportObjects.length"
-    mat-menu-item
-    [matMenuTriggerFor]="exportObjectsMenu"
-  >
-    <mat-icon>unarchive</mat-icon>
-    <span>Export Objects</span>
-  </button>
+  @if (exportObjects.length) {
+    <mat-divider></mat-divider>
+  }
+  @if (exportObjects.length) {
+    <button
+      mat-menu-item
+      [matMenuTriggerFor]="exportObjectsMenu"
+      >
+      <mat-icon>unarchive</mat-icon>
+      <span>Export Objects</span>
+    </button>
+  }
 </mat-menu>
 <mat-menu #exportObjectsMenu="matMenu">
-  <button
-    mat-menu-item
-    *ngFor="let item of exportObjects"
-    (click)="onMenuClick(item.tap, 'Export ' + item.name + ' Objects')"
-  >
-    {{ item.name }}
-  </button>
+  @for (item of exportObjects; track item) {
+    <button
+      mat-menu-item
+      (click)="onMenuClick(item.tap, 'Export ' + item.name + ' Objects')"
+      >
+      {{ item.name }}
+    </button>
+  }
 </mat-menu>
 
 <mat-menu #analyzeMenu="matMenu">
@@ -63,22 +76,24 @@
   <button mat-menu-item (click)="onMenuClick('flow', 'Flow Graph')">Flow Graph</button>
 </mat-menu>
 <mat-menu #convsMenu="matMenu">
-  <button
-    mat-menu-item
-    *ngFor="let item of convs"
-    (click)="onMenuClick(item.tap, item.name + ' Conversations')"
-  >
-    {{ item.name }}
-  </button>
+  @for (item of convs; track item) {
+    <button
+      mat-menu-item
+      (click)="onMenuClick(item.tap, item.name + ' Conversations')"
+      >
+      {{ item.name }}
+    </button>
+  }
 </mat-menu>
 <mat-menu #endptsMenu="matMenu">
-  <button
-    mat-menu-item
-    *ngFor="let item of endpts"
-    (click)="onMenuClick(item.tap, item.name + ' Endpoints')"
-  >
-    {{ item.name }}
-  </button>
+  @for (item of endpts; track item) {
+    <button
+      mat-menu-item
+      (click)="onMenuClick(item.tap, item.name + ' Endpoints')"
+      >
+      {{ item.name }}
+    </button>
+  }
 </mat-menu>
 
 <mat-menu #telephonyMenu="matMenu">

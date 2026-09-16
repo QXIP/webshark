@@ -3,11 +3,11 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Output, 
 import { environment } from '@environments/environment';
 
 @Component({
-  selector: 'app-files-page',
-  templateUrl: './files-page.component.html',
-  styleUrls: ['./files-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-
+    selector: 'app-files-page',
+    templateUrl: './files-page.component.html',
+    styleUrls: ['./files-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FilesPageComponent implements OnInit {
   files: any[] = [];

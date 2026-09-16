@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, EventEmitter, Output, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, EventEmitter, Output, AfterViewInit, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Functions, hash } from '@app/helper/functions';
 import { ThemeService } from '@app/services/theme.service';
 import { Subscription } from 'rxjs';
@@ -21,9 +21,11 @@ export interface ChartData {
 }
 
 @Component({
-  selector: 'flexible-chart',
-  templateUrl: './flexible-chart.component.html',
-  styleUrls: ['./flexible-chart.component.scss']
+    selector: 'flexible-chart',
+    templateUrl: './flexible-chart.component.html',
+    styleUrls: ['./flexible-chart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class FlexibleChartComponent implements OnInit, AfterViewInit, OnDestroy {
   exampleData: ChartData[] = [];

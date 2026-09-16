@@ -1,13 +1,15 @@
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { conversationDisplayFilter, expertSeverityFilter, exportObjectToken } from '@app/helper/wireshark-views';
 import { packetFlowFromFrames } from '@app/helper/flow-view';
 import { frameTreeFromSharkd } from '@app/helper/live-follow';
 
 @Component({
-  selector: 'tap-page',
-  templateUrl: './tap-page.component.html',
-  styleUrls: ['./tap-page.component.scss']
+    selector: 'tap-page',
+    templateUrl: './tap-page.component.html',
+    styleUrls: ['./tap-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class TapPageComponent {
   public loading = false;

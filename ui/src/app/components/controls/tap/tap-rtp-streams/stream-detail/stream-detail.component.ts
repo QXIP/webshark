@@ -1,14 +1,16 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { hash } from '@app/helper/functions';
 import WaveSurfer from 'wavesurfer.js';
-import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline';
+import TimelinePlugin from 'wavesurfer.js/plugins/timeline';
 import { TypeOfChart } from '@app/components/controls/flexible-chart/flexible-chart.component';
 import { rtpStreamColumns } from '@app/helper/rtp-from-frames';
 
 @Component({
-  selector: 'stream-detail',
-  templateUrl: './stream-detail.component.html',
-  styleUrls: ['./stream-detail.component.scss']
+    selector: 'stream-detail',
+    templateUrl: './stream-detail.component.html',
+    styleUrls: ['./stream-detail.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class StreamDetailComponent implements AfterViewInit, OnDestroy {
 

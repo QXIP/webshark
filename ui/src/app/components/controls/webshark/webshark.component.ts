@@ -24,11 +24,11 @@ import { ModalResizableService } from '../modal-resizable/modal-resizable.servic
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-webshark',
-  templateUrl: './webshark.component.html',
-  styleUrls: ['./webshark.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-
+    selector: 'app-webshark',
+    templateUrl: './webshark.component.html',
+    styleUrls: ['./webshark.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   textFilterGrid: string = '';
@@ -273,7 +273,7 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private shouldStickToBottom(): boolean {
-    const viewport = this.tableDiv?.nativeElement?.querySelector('cdk-virtual-scroll-viewport') as HTMLElement | null;
+    const viewport = this.packetListScroll();
     if (!viewport) {
       return true;
     }
@@ -281,10 +281,14 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollPacketListToBottom() {
-    const viewport = this.tableDiv?.nativeElement?.querySelector('cdk-virtual-scroll-viewport') as HTMLElement | null;
+    const viewport = this.packetListScroll();
     if (viewport) {
       viewport.scrollTop = viewport.scrollHeight;
     }
+  }
+
+  private packetListScroll(): HTMLElement | null {
+    return this.tableDiv?.nativeElement?.querySelector('.table-scroll') as HTMLElement | null;
   }
 
   showMessage(event: any) {
@@ -353,23 +357,6 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filterChoices = [];
     }
     this.cdr.detectChanges();
-  }
-  openFollow() {
-    const fol = this.webSharkDataService.getLastFollow();
-    const proto = fol?.proto || 'TCP';
-    this.webSharkDataService.setView('follow', { follow: proto });
-    this.modalResizableService.open({ link: `follow:${proto}`, name: `Follow ${proto} Stream` });
-  }
-  openFlowGraph() {
-    const fol = this.webSharkDataService.getLastFollow();
-    const filter = fol?.filter || this.webSharkDataService.getFilter() || '';
-    const link = filter ? `flow:${encodeURIComponent(filter)}` : 'flow';
-    this.webSharkDataService.setView('flow');
-    this.modalResizableService.open({ link, name: 'Flow Graph' });
-  }
-  openIoGraph() {
-    this.webSharkDataService.setView('iograph');
-    this.modalResizableService.open({ link: 'iograph', name: 'I/O Graph' });
   }
   onSelected(event: any) {
     this.highlight = event.highlight;

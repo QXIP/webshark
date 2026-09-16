@@ -9,7 +9,7 @@
   (keyup)="onKeyUpFilterTree()"
   matTooltip="Use symbol || (logical OR) for multiple filtering, EXAMPLE: point1||point2||point3">
 <div class="field-sticky color"
-  [innerHTML]="highlight(textFilterTree, true) | html"></div>
+[innerHTML]="highlight(textFilterTree, true) | html"></div>
 <mat-tree [dataSource]="dataSource"
   [treeControl]="treeControl"
   #tree>
@@ -22,18 +22,21 @@
     [style.background-color]="noPadding && 'rgba(0,0,0,' + ( (2.5 - node.level) / 12) + ')'"
     matTreeNodePadding>
     <button mat-icon-button
-      disabled></button>
-    <mat-icon *ngIf="fileIcon"
-      class="files file"
+    disabled></button>
+    @if (fileIcon) {
+      <mat-icon
+        class="files file"
       color="primary">insert_drive_file </mat-icon>
+    }
     <span class="line-html"
       [innerHTML]=" highlight(node.name) | html "
-      (click)="onClickLine(node)"></span>
-    <button mat-icon-button
-      *ngIf="isFilter"
-      (click)="setFilterGrid(node.description)">
-      <mat-icon class="mat-icon-rtl-mirror">filter_list</mat-icon>
-    </button>
+    (click)="onClickLine(node)"></span>
+    @if (isFilter) {
+      <button mat-icon-button
+        (click)="setFilterGrid(node.description)">
+        <mat-icon class="mat-icon-rtl-mirror">filter_list</mat-icon>
+      </button>
+    }
   </mat-tree-node>
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
     [style.display]="treeFilter(node) ? 'flex' : 'none'"
@@ -50,19 +53,22 @@
         {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
       </mat-icon>
     </button>
-    <mat-icon *ngIf="fileIcon"
-      class="files"
+    @if (fileIcon) {
+      <mat-icon
+        class="files"
       color="primary">folder</mat-icon>
+    }
     <span class="line-html"
       matTreeNodeToggle
       [attr.aria-label]="'Toggle ' + node.name"
       [innerHTML]=" highlight(node.name) | html "
-      (click)="onClickLine(node)"></span>
-    <button mat-icon-button
-      *ngIf="isFilter"
-      (click)="setFilterGrid(node.description)">
-      <mat-icon class="mat-icon-rtl-mirror">filter_list</mat-icon>
-    </button>
+    (click)="onClickLine(node)"></span>
+    @if (isFilter) {
+      <button mat-icon-button
+        (click)="setFilterGrid(node.description)">
+        <mat-icon class="mat-icon-rtl-mirror">filter_list</mat-icon>
+      </button>
+    }
 
   </mat-tree-node>
 

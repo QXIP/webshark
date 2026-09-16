@@ -1,76 +1,39 @@
-<div
-  class="mat-elevation-z8 table-host"
-  style="
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    flex: 1;
-  "
->
-  <cdk-virtual-scroll-viewport
-    [tvsItemSize]="30"
-    style="height: 100%; width: 100%; min-width: 0; min-height: 0; flex: 1"
-  >
-    <table
-      mat-table
-      matSort
-      style="flex: 0"
-      [dataSource]="dataSource"
-      class="this-table"
-    >
-      <ng-container
-        *ngFor="let item of columnsValue; let i = index"
-        [matColumnDef]="item"
-      >
-        <ng-container>
+<div class="mat-elevation-z8 table-host">
+  <div class="table-scroll" #scrollHost>
+    <table mat-table matSort [dataSource]="dataSource" class="this-table">
+      @for (item of columnsValue; track item) {
+        <ng-container [matColumnDef]="item">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            <div style="float: left; max-width: 100%">
-              <div style="max-width: 100%; text-align: left">
-                {{ item | titlecase }}
-              </div>
-              <div *ngIf="checkFilterColumn(item)" style="max-width: 100%">
+            <div class="header-cell">
+              <div>{{ item | titlecase }}</div>
+              @if (checkFilterColumn(item)) {
                 <input
                   [placeholder]="item"
                   class="search-input"
                   value=""
                   (keyup)="applyFilter($event, item)"
                 />
-              </div>
+              }
             </div>
           </th>
-          <td *matCellDef="let element">
+          <td mat-cell *matCellDef="let element">
             {{ element[getKeyBy(item)] }}
           </td>
         </ng-container>
-      </ng-container>
+      }
 
-      <tbody>
-        <tr mat-header-row *matHeaderRowDef="columnsValue"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; index as i; columns: columnsValue"
-          [style.background-color]="
-            getSelected(i) ? '#3f51b5' : row.bg && '#' + row.bg
-          "
-          [style.color]="
-            getSelected(i)
-              ? '#fff !important'
-              : row.fg && '#' + row.fg + ' !important'
-          "
-          (click)="onRowClick(row, i, $event)"
-          (dblclick)="onRowDblClick(row, i, $event)"
-        ></tr>
-      </tbody>
+      <tr mat-header-row *matHeaderRowDef="columnsValue; sticky: true"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; index as i; columns: columnsValue"
+        [style.background-color]="getSelected(i) ? '#3f51b5' : row.bg && '#' + row.bg"
+        [style.color]="getSelected(i) ? '#fff' : row.fg && '#' + row.fg"
+        (click)="onRowClick(row, i, $event)"
+        (dblclick)="onRowDblClick(row, i, $event)"
+      ></tr>
     </table>
-  </cdk-virtual-scroll-viewport>
-  <div style="flex: 0"></div>
-  <mat-paginator
-    *ngIf="isPaginator"
-    style="flex: 0"
-    [pageSizeOptions]="[10, 25, 50, 100, 200]"
-    showFirstLastButtons
-  ></mat-paginator>
+  </div>
+  @if (isPaginator) {
+    <mat-paginator [pageSizeOptions]="[10, 25, 50, 100, 200]" showFirstLastButtons></mat-paginator>
+  }
 </div>

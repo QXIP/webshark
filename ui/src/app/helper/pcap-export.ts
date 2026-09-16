@@ -1,3 +1,4 @@
+import { copyToArrayBuffer } from './capture-bytes';
 import { bytesFromFrameDump } from './follow-extract';
 
 export function pcapTimestamp(time: any): { sec: number; usec: number } {
@@ -61,7 +62,7 @@ export function triggerBrowserDownload(data: Blob | Uint8Array, filename: string
   if (typeof document === 'undefined') {
     return;
   }
-  const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+  const blob = data instanceof Blob ? data : new Blob([copyToArrayBuffer(data)], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

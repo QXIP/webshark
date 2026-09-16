@@ -15,10 +15,11 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'modal-resizable',
-  templateUrl: './modal-resizable.component.html',
-  styleUrls: ['./modal-resizable.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'modal-resizable',
+    templateUrl: './modal-resizable.component.html',
+    styleUrls: ['./modal-resizable.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ModalResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   static ZIndex = 12;
@@ -98,7 +99,7 @@ export class ModalResizableComponent implements OnInit, AfterViewInit, OnDestroy
     this.cdr.detectChanges();
   }
 
-  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: Event) {
     event.preventDefault();
     event.stopPropagation();
     this.onClose();

@@ -1,13 +1,15 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, ChangeDetectionStrategy, Input } from '@angular/core';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { ModalResizableService } from '../modal-resizable/modal-resizable.service';
 import { AlertService } from '../alert/alert.service';
 import { tapInfoLists } from '@app/helper/wireshark-views';
 
 @Component({
-  selector: 'app-menu-stat',
-  templateUrl: './menu-stat.component.html',
-  styleUrls: ['./menu-stat.component.scss']
+    selector: 'app-menu-stat',
+    templateUrl: './menu-stat.component.html',
+    styleUrls: ['./menu-stat.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class MenuStatComponent implements OnInit {
   convs: any[] = [];
@@ -16,6 +18,7 @@ export class MenuStatComponent implements OnInit {
   hasCapture = false;
   hasFilter = false;
   exporting = false;
+  @Input() liveFollowing = false;
   @ViewChild('fileOpen') fileOpen?: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -39,6 +42,24 @@ export class MenuStatComponent implements OnInit {
   public onMenuClick(link: string, name: string) {
     this.modalResizableService.open({ link, name });
     this.cdr.detectChanges();
+  }
+
+  openFollow() {
+    const proto = this.webSharkDataService.getLastFollow()?.proto || 'TCP';
+    this.webSharkDataService.setView('follow', { follow: proto });
+    this.modalResizableService.open({ link: `follow:${proto}`, name: `Follow ${proto} Stream` });
+  }
+
+  openFlowGraph() {
+    const filter = this.webSharkDataService.getLastFollow()?.filter || this.webSharkDataService.getFilter() || '';
+    const link = filter ? `flow:${encodeURIComponent(filter)}` : 'flow';
+    this.webSharkDataService.setView('flow');
+    this.modalResizableService.open({ link, name: 'Flow Graph' });
+  }
+
+  openIoGraph() {
+    this.webSharkDataService.setView('iograph');
+    this.modalResizableService.open({ link: 'iograph', name: 'I/O Graph' });
   }
 
   openLocalCapture() {

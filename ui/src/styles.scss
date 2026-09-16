@@ -10,6 +10,8 @@ body {
   margin: 0;
   overflow: hidden;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: var(--ws-font-size, 12px);
+  line-height: 1.35;
   background: var(--ws-bg);
   color: var(--ws-text);
 }
@@ -33,12 +35,28 @@ body {
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; font-size: var(--ws-font-size, 12px); }
 
 .mat-mdc-menu-panel {
   max-width: initial !important;
 }
 .mat-mdc-menu-item {
   min-height: initial !important;
-  padding: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+.mat-button-toggle-checkbox-wrapper {
+  display: none !important;
+}
+
+.mat-button-toggle-label-content {
+  padding: 0 8px !important;
+  line-height: 26px !important;
+  font-size: 12px !important;
+}
+
+.mdc-tab,
+.mat-mdc-tab {
+  font-size: 12px;
 }

@@ -15,10 +15,12 @@
     padding: 0 4px;
     margin-right: 1rem;
     font-family: monospace;
+    font-size: 12px;
   }
 
   .col-hex {
     font-family: monospace;
+    font-size: 12px;
     padding: 0 4px;
     &:hover {
       background-color: var(--ws-hex-hover);
@@ -37,6 +39,7 @@
 
   .col-char {
     font-family: monospace;
+    font-size: 12px;
   }
 
 }

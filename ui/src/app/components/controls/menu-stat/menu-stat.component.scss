@@ -1,12 +1,29 @@
 .menu-stat {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   min-height: 2rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 .menu-stat button {
+  flex: 0 0 auto;
   min-width: auto;
   line-height: 2rem;
   height: 2rem;
-  font-size: 13px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.menu-stat-sep {
+  display: inline-block;
+  width: 1px;
+  height: 1.1rem;
+  margin: 0 0.25rem;
+  background: var(--ws-border);
+}
+.live-pill {
+  font-size: 12px;
+  color: #2e7d32;
+  margin-left: 0.35rem;
 }

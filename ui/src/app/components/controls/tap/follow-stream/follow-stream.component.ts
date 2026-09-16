@@ -1,11 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { WebSharkDataService } from '@app/services/web-shark-data.service';
 import { packetFlowFromFrames } from '@app/helper/flow-view';
 
 @Component({
-  selector: 'follow-stream',
-  templateUrl: './follow-stream.component.html',
-  styleUrls: ['./follow-stream.component.scss']
+    selector: 'follow-stream',
+    templateUrl: './follow-stream.component.html',
+    styleUrls: ['./follow-stream.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class FollowStreamComponent {
   chunks: Array<{ d: string; s: number; n?: number }> = [];

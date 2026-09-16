@@ -1,35 +1,42 @@
 <isData class="is-data-wrapper" [noDataIf]="flowItems.length === 0">
-  <div class="seq" *ngIf="hosts.length">
-    <div class="seq-head">
-      <div class="seq-time">Time</div>
-      <div class="seq-lanes">
-        <div class="seq-host" *ngFor="let host of hosts">{{ host }}</div>
-      </div>
-    </div>
-    <div class="seq-body">
-      <div
-        class="seq-row"
-        *ngFor="let item of flowItems; let idx = index"
-        [class.selected]="getSelected(idx)"
-        (click)="setSelected(idx)"
-      >
-        <div class="seq-time">{{ formatTime(item.t) }}</div>
+  @if (hosts.length) {
+    <div class="seq">
+      <div class="seq-head">
+        <div class="seq-time">Time</div>
         <div class="seq-lanes">
-          <div class="seq-lane" *ngFor="let host of hosts">
-            <div class="seq-vline"></div>
-          </div>
-          <div
-            class="seq-msg"
-            [class.left]="arrowBox(item).reverse"
-            [style.left.%]="arrowBox(item).left"
-            [style.width.%]="arrowBox(item).width"
-            [style.color]="arrowColor(item)"
-          >
-            <span>{{ item.c }}</span>
-            <div class="seq-arrow" [class.left]="arrowBox(item).reverse"></div>
-          </div>
+          @for (host of hosts; track host) {
+            <div class="seq-host">{{ host }}</div>
+          }
         </div>
       </div>
+      <div class="seq-body">
+        @for (item of flowItems; track item; let idx = $index) {
+          <div
+            class="seq-row"
+            [class.selected]="getSelected(idx)"
+            (click)="setSelected(idx)"
+            >
+            <div class="seq-time">{{ formatTime(item.t) }}</div>
+            <div class="seq-lanes">
+              @for (host of hosts; track host) {
+                <div class="seq-lane">
+                  <div class="seq-vline"></div>
+                </div>
+              }
+              <div
+                class="seq-msg"
+                [class.left]="arrowBox(item).reverse"
+                [style.left.%]="arrowBox(item).left"
+                [style.width.%]="arrowBox(item).width"
+                [style.color]="arrowColor(item)"
+                >
+                <span>{{ item.c }}</span>
+                <div class="seq-arrow" [class.left]="arrowBox(item).reverse"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
 </isData>

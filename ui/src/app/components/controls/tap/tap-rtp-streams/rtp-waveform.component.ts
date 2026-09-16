@@ -7,21 +7,24 @@ import {
   Input,
   OnDestroy,
   Output,
-  ViewChild
+  ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import WaveSurfer from 'wavesurfer.js';
 
 @Component({
-  selector: 'rtp-waveform',
-  template: `
+    selector: 'rtp-waveform',
+    template: `
     <div class="wave-label" [style.color]="color">{{ label }}</div>
     <div #host class="wave-host"></div>
   `,
-  styles: [`
+    styles: [`
     :host { display: block; width: 100%; }
     .wave-label { font-size: 11px; padding: 0 0.2rem 0.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .wave-host { width: 100%; height: 40px; min-height: 40px; }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class RtpWaveformComponent implements AfterViewInit, OnDestroy {
   @Input() url = '';

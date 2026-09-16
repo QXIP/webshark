@@ -9,14 +9,32 @@ $bgColor: var(--ws-hover);
   min-height: 0;
 }
 
-:host ::ng-deep cdk-virtual-scroll-viewport {
-  width: 100%;
+.table-host {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  width: 100%;
   min-width: 0;
+  min-height: 0;
+  flex: 1;
+}
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+
+.header-cell {
+  float: left;
+  max-width: 100%;
+  text-align: left;
 }
 
 table.this-table {
   table-layout: fixed;
+  font-size: 12px;
   // width: 100%;
   // max-width: 100%;
 
