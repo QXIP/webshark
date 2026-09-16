@@ -273,7 +273,7 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private shouldStickToBottom(): boolean {
-    const viewport = this.tableDiv?.nativeElement?.querySelector('cdk-virtual-scroll-viewport') as HTMLElement | null;
+    const viewport = this.packetListScroll();
     if (!viewport) {
       return true;
     }
@@ -281,10 +281,14 @@ export class WebsharkComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollPacketListToBottom() {
-    const viewport = this.tableDiv?.nativeElement?.querySelector('cdk-virtual-scroll-viewport') as HTMLElement | null;
+    const viewport = this.packetListScroll();
     if (viewport) {
       viewport.scrollTop = viewport.scrollHeight;
     }
+  }
+
+  private packetListScroll(): HTMLElement | null {
+    return this.tableDiv?.nativeElement?.querySelector('.table-scroll') as HTMLElement | null;
   }
 
   showMessage(event: any) {

@@ -1,11 +1,9 @@
-import { Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, ElementRef } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Functions } from '@app/helper/functions';
-import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
-// dataSource = new TableVirtualScrollDataSource(DATA);
+
 @Component({
     selector: 'app-custom-table',
     templateUrl: './custom-table.component.html',
@@ -26,20 +24,20 @@ export class CustomTableComponent {
   getKeyBy(value: any): any {
     return this.isDictionary ? Object.entries(this.columns).find(([key, val]) => val === value)?.[0] : value;
   }
-  selectedRowIndex: number = -1; // -1 is selected nothings
+  selectedRowIndex: number = -1;
 
   @Output() rowClick: EventEmitter<any> = new EventEmitter();
   @Output() rowDblClick: EventEmitter<any> = new EventEmitter();
-  @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
+  @ViewChild('scrollHost') scrollHost?: ElementRef<HTMLElement>;
   @ViewChild(MatSort, { static: true }) sort: any;
   @ViewChild(MatPaginator, { static: true }) paginator: any;
 
-  dataSource = new TableVirtualScrollDataSource([]);
+  dataSource = new MatTableDataSource<any>([]);
   tableFilters: any[] = [];
   @Input() isPaginator = true;
   @Input()
   set details(val: any) {
-    this.dataSource = new TableVirtualScrollDataSource(val);
+    this.dataSource = new MatTableDataSource(val || []);
     if (this.isPaginator) {
       this.dataSource.paginator = this.paginator;
     }
@@ -62,9 +60,8 @@ export class CustomTableComponent {
   }
   public scrollToIndex(index: number) {
     this.setSelected(index);
-    try {
-      this.viewport?.scrollToIndex(Math.max(0, index));
-    } catch (err) {}
+    const rows = this.scrollHost?.nativeElement.querySelectorAll('tr.mat-mdc-row, tr.mat-row');
+    (rows?.[index] as HTMLElement | undefined)?.scrollIntoView({ block: 'nearest' });
   }
   public getSelected(index: number) {
     return this.selectedRowIndex === index;
