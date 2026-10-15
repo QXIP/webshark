@@ -15,16 +15,16 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^22.1.6",
-    "@angular/cdk": "^22.1.6",
-    "@angular/common": "^22.1.6",
-    "@angular/compiler": "^22.1.6",
-    "@angular/core": "^22.1.6",
-    "@angular/forms": "^22.1.6",
-    "@angular/material": "^22.1.6",
-    "@angular/platform-browser": "^22.1.6",
-    "@angular/platform-browser-dynamic": "^22.1.6",
-    "@angular/router": "^22.1.6",
+    "@angular/animations": "^22.2.0",
+    "@angular/cdk": "^22.2.0",
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/material": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/platform-browser-dynamic": "^22.2.0",
+    "@angular/router": "^22.2.0",
     "@ffmpeg/ffmpeg": "^0.12.6",
     "@ffmpeg/util": "^0.12.1",
     "@fortawesome/angular-fontawesome": "^5.1.0",
@@ -34,7 +34,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@goodtools/wiregasm": "^1.9.1",
     "angular-split": "^20.0.0",
-    "moment": "^2.29.4",
+    "moment": "^2.31.0",
     "moment-timezone": "^0.5.43",
     "ng-table-virtual-scroll": "^1.6.1",
     "rxjs": "~7.8.0",
@@ -44,9 +44,9 @@
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.1.8",
-    "@angular/cli": "~22.1.8",
-    "@angular/compiler-cli": "^22.1.6",
+    "@angular/build": "^22.2.0",
+    "@angular/cli": "~22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
     "@types/jasmine": "~4.3.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~4.6.0",
@@ -57,5 +57,11 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~6.0.3",
     "chokidar": "^5.0.0"
+  },
+  "overrides": {
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "piscina": "5.3.2",
+    "qs": "6.15.2",
+    "ws": "8.21.0"
   }
 }
