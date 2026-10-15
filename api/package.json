@@ -33,7 +33,7 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "tap": "^16.3.8"
+    "tap": "^21.8.0"
   },
   "overrides": {
     "@babel/core": "7.29.6",
